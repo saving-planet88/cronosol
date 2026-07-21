@@ -41,8 +41,11 @@ h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-1px;margin-bot
 .brand-body{max-height:0;overflow:hidden;transition:max-height .25s ease}
 .brand-card.open .brand-body{max-height:900px}
 .brand-body-in{padding:0 20px 20px}
-.brand-body ol{padding-left:20px;margin-bottom:12px}
-.brand-body li{font-size:14px;color:#CBD5E1;margin-bottom:8px;line-height:1.55}
+.brand-body .lead{font-size:14px;color:#CBD5E1;line-height:1.6;margin-bottom:14px}
+.brand-body .lead:last-child{margin-bottom:0}
+.links{display:flex;flex-direction:column;gap:8px}
+.off-link{display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--s2);border:1px solid #334155;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--tx);text-decoration:none}
+.off-link:hover{border-color:var(--sol);color:var(--sol)}
 .brand-warn{font-size:12.5px;color:#F59E0B;background:#F59E0B12;border-radius:8px;padding:8px 12px;margin-top:4px}
 
 .ctaband{margin-top:40px;background:linear-gradient(135deg,#1a2332,#111827);border:1px solid var(--bdr);border-radius:20px;padding:32px;text-align:center}
@@ -60,10 +63,10 @@ h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-1px;margin-bot
   <div class="hdr">
     <div class="kicker">Configuración</div>
     <h1>Cómo programar tu inversor</h1>
-    <p class="intro">CronoSol te dice a qué hora conviene cargar o descargar la batería — pero quien ejecuta ese plan es tu inversor. Aquí tienes los pasos para programar las franjas horarias según tu marca.</p>
+    <p class="intro">CronoSol te dice a qué hora conviene cargar o descargar la batería — pero quien ejecuta ese plan es tu inversor. Aquí tienes el enlace directo a la documentación oficial de cada fabricante para programar las franjas horarias.</p>
   </div>
 
-  <div class="note">⚠️ Los menús exactos pueden variar según el modelo y la versión de firmware/app de tu inversor. Si algo no coincide, contacta con tu instalador — puede que la función esté bloqueada de fábrica.</div>
+  <div class="note">⚠️ Los menús exactos varían según el modelo y la versión de firmware/app — por eso enlazamos siempre a la fuente oficial del fabricante en vez de describir pasos que pueden quedar desactualizados. Si algo no coincide con tu equipo, contacta con tu instalador.</div>
 
   <div class="brands">
 
@@ -74,13 +77,11 @@ h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-1px;margin-bot
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <ol>
-          <li>Abre la app <strong>FusionSolar</strong> y entra en tu planta.</li>
-          <li>Ve a <strong>Ajustes</strong> (⚙️) → busca la gestión de batería, normalmente llamada <strong>TOU</strong> (Time of Use) o "Estrategia de carga".</li>
-          <li>Añade un tramo horario de <strong>carga</strong> en las horas que te indique el plan de CronoSol (ej. 10:00–15:00).</li>
-          <li>Añade un tramo de <strong>descarga</strong> en las horas caras que te marquemos (ej. 19:00–23:00).</li>
-          <li>Guarda los cambios. Algunos modelos tardan unos minutos en aplicarlos al inversor físico.</li>
-        </ol>
+        <p class="lead">En la app FusionSolar, la función se llama <strong>"Scheduled Charging"</strong> (carga programada) dentro de los parámetros de batería. Documentación oficial de Huawei:</p>
+        <div class="links">
+          <a class="off-link" href="https://support.huawei.com/enterprise/en/doc/EDOC1100165054/f8bedcea/scheduled-charging" target="_blank" rel="noopener">📄 Scheduled Charging — FusionSolar App User Manual</a>
+          <a class="off-link" href="https://support.huawei.com/enterprise/en/doc/EDOC1100182221/e816aff4/battery-parameters" target="_blank" rel="noopener">📄 Battery Parameters — FusionSolar App User Manual</a>
+        </div>
       </div></div>
     </div>
 
@@ -91,13 +92,11 @@ h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-1px;margin-bot
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <ol>
-          <li>Entra en <strong>solar.web</strong> con tu cuenta de usuario o instalador.</li>
-          <li>Ve a tu planta → <strong>Configuración avanzada</strong> → <strong>Gestión de batería</strong> (Battery Management).</li>
-          <li>Busca la opción de carga/descarga forzada por horario, si tu modelo la soporta.</li>
-          <li>Define las franjas horarias según el plan que te dé CronoSol.</li>
-        </ol>
-        <div class="brand-warn">No todos los inversores Fronius domésticos traen esta opción activada de fábrica — si no la ves, pide a tu instalador que la habilite.</div>
+        <p class="lead">Fronius llama a esta función <strong>"Time-of-Use"</strong> (control de batería por franjas horarias). No todos los inversores domésticos la traen activada de fábrica — si no la ves, consulta con tu instalador. Documentación oficial de Fronius:</p>
+        <div class="links">
+          <a class="off-link" href="https://www.fronius.com/en/~/downloads/Solar%20Energy/Whitepaper/SE_WP_How_to_set_up_Battery_control_schedule_EN.pdf" target="_blank" rel="noopener">📄 Correctly Setting the Time-of-Use Storage (PDF oficial)</a>
+          <a class="off-link" href="https://www.fronius.com/en/~/downloads/Solar%20Energy/Whitepaper/SE_WP_Time_Of_Use_Hybrid_Inverters_EN.pdf" target="_blank" rel="noopener">📄 Time-of-Use Settings with Fronius Hybrid Inverters (PDF oficial)</a>
+        </div>
       </div></div>
     </div>
 
@@ -108,12 +107,11 @@ h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-1px;margin-bot
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <ol>
-          <li>Entra en <strong>vrm.victronenergy.com</strong>.</li>
-          <li>Ve a tu instalación → configuración del dispositivo GX → <strong>ESS</strong> (Energy Storage System).</li>
-          <li>En "Configuración programada" (Scheduled charging), añade las franjas horarias que te indique CronoSol.</li>
-          <li>Guarda — Victron suele aplicar los cambios casi al instante.</li>
-        </ol>
+        <p class="lead">En Victron se configura como <strong>"Scheduled Charging"</strong> dentro del menú ESS del dispositivo GX, gestionado desde VRM. Documentación oficial de Victron Energy:</p>
+        <div class="links">
+          <a class="off-link" href="https://www.victronenergy.com/live/ess:scheduled_charging" target="_blank" rel="noopener">📄 ESS: Scheduled Charging — Victron Energy</a>
+          <a class="off-link" href="https://www.victronenergy.com/media/pg/VRM_Portal_manual/en/control-your-devices-in-vrm.html" target="_blank" rel="noopener">📄 Control your devices in VRM — VRM Portal Manual</a>
+        </div>
       </div></div>
     </div>
 
@@ -124,12 +122,8 @@ h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-1px;margin-bot
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <ol>
-          <li>Busca en el manual o la app de tu inversor los términos <strong>"Time of Use"</strong>, "gestión de batería" o "franjas horarias".</li>
-          <li>La mayoría de inversores modernos con batería permiten programar cuándo cargar y descargar según el reloj.</li>
-          <li>Si no encuentras la opción, contacta con tu instalador — puede estar bloqueada de fábrica.</li>
-          <li>¿Nos cuentas qué marca tienes? Escríbenos al bot con <code>/marca &lt;nombre&gt;</code> y añadiremos una guía específica.</li>
-        </ol>
+        <p class="lead">Busca en el manual o la app de tu inversor los términos <strong>"Time of Use"</strong>, "carga programada" o "gestión de batería" — la mayoría de inversores modernos con batería permiten programar cuándo cargar y descargar según el reloj. Si no encuentras la opción, contacta con tu instalador: puede estar bloqueada de fábrica.</p>
+        <p class="lead">¿Nos cuentas qué marca tienes? Escríbenos al bot con <code>/marca &lt;nombre&gt;</code> y añadiremos su enlace oficial aquí.</p>
       </div></div>
     </div>
 
