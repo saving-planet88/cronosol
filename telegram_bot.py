@@ -113,7 +113,7 @@ async def fetch_plan(u: dict, target_date: date):
 
 def report_link(u: dict, target_date: date) -> str:
     return (
-        f"{WEB_PUBLIC_URL}/?lat={u['lat']}&lon={u['lon']}&kwp={u['kwp']}"
+        f"{WEB_PUBLIC_URL}/optimizar?lat={u['lat']}&lon={u['lon']}&kwp={u['kwp']}"
         f"&battery={u['battery']}&consumption={u['consumption']}&date={target_date}"
     )
 
@@ -379,7 +379,7 @@ async def check_and_alert(users):
 
     for chat_id, u in users.items():
         plan = u.get("today_plan")
-        if not plan or u.get("awaiting"):
+        if not plan or not isinstance(plan, dict) or u.get("awaiting"):
             continue
 
         hours = plan.get("hours", [])

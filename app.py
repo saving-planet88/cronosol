@@ -357,7 +357,11 @@ async def api_solar(
 # ── Servir frontend ──────────────────────────────────────
 
 @app.get("/")
-async def serve_index():
+async def serve_landing():
+    return FileResponse("static/landing.html")
+
+@app.get("/optimizar")
+async def serve_optimizar():
     return FileResponse("static/index.html")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
