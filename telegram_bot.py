@@ -60,7 +60,7 @@ async def fetch_prices(target_date):
     params = {
         "start_date": f"{target_date}T00:00:00",
         "end_date": f"{target_date}T23:59:59",
-        "geo_ids[]": 8741,
+        "geo_ids[]": 3,  # España
     }
     async with httpx.AsyncClient(timeout=15) as client:
         resp = await client.get(url, headers=headers, params=params)

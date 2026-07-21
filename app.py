@@ -92,7 +92,7 @@ async def fetch_esios_prices(target_date: date) -> list[float]:
     params = {
         "start_date": start,
         "end_date": end,
-        "geo_ids[]": 8741,  # Península
+        "geo_ids[]": 3,  # España
     }
 
     async with httpx.AsyncClient(timeout=15) as client:
