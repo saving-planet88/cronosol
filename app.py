@@ -87,6 +87,7 @@ async def fetch_esios_prices(target_date: date) -> list[float]:
         "Content-Type": "application/json",
         "Host": "api.esios.ree.es",
         "Authorization": f'Token token="{ESIOS_TOKEN}"',
+        "x-api-key": ESIOS_TOKEN,
     }
     params = {
         "start_date": start,
