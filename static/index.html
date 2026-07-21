@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SolOptim — Optimiza tu autoconsumo solar</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+:root {
+  --bg:#0B0F19; --s1:#111827; --s2:#1E293B; --bdr:#1E293B;
+  --tx:#E2E8F0; --dim:#64748B; --dim2:#475569;
+  --sol:#EAB308; --grn:#22C55E; --red:#EF4444; --blu:#3B82F6; --pur:#A855F7;
+  --r:12px; --ff:'DM Sans',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--ff);background:var(--bg);color:var(--tx);min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
+
+/* Header */
+.hdr{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.logo{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#EAB308,#F59E0B);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 20px #EAB30840}
+.hdr h1{font-size:21px;font-weight:700;letter-spacing:-.5px}
+.hdr h1 b{color:var(--sol)}
+.badge{margin-left:auto;font-size:11px;color:var(--dim2);background:var(--s2);padding:4px 10px;border-radius:6px}
+
+/* Cards */
+.card{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:20px}
+.sec-h{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:14px;font-weight:600}
+
+/* Inputs */
+label{display:block;font-size:11px;color:var(--dim);margin-bottom:3px;font-weight:500}
+input,select{width:100%;padding:9px 11px;background:var(--s2);border:1px solid #334155;border-radius:7px;color:var(--tx);font-family:var(--mono);font-size:13px;outline:none}
+input:focus{border-color:var(--sol)}
+.unit{font-size:10px;color:var(--dim2);margin-top:2px}
+
+/* Layout */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+
+/* Buttons */
+.btn{padding:12px 32px;background:linear-gradient(135deg,#EAB308,#CA8A04);color:var(--bg);border:none;border-radius:8px;font-family:var(--ff);font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px #EAB30830}
+.btn:hover{filter:brightness(1.1)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-s{padding:6px 12px;background:transparent;border:1px solid #334155;border-radius:6px;color:#94A3B8;font-size:11px;cursor:pointer;font-family:var(--ff);font-weight:500}
+.btn-s:hover{border-color:var(--sol);color:var(--sol)}
+.btn-find{padding:9px 14px;background:var(--sol);border:none;border-radius:7px;color:var(--bg);font-size:12px;cursor:pointer;font-weight:700;white-space:nowrap}
+
+/* KPI */
+.kpi .label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);margin-bottom:8px;font-weight:600}
+.kpi .val{font-family:var(--mono);font-size:24px;font-weight:700;line-height:1}
+.kpi .det{font-size:11px;color:var(--dim2);margin-top:5px}
+
+/* Tags */
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:7px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);border-bottom:1px solid var(--bdr);white-space:nowrap}
+td{padding:5px 8px;border-bottom:1px solid #1E293B15;font-family:var(--mono);font-size:11px;white-space:nowrap}
+tr:hover td{background:#1E293B30}
+
+/* Alert cards */
+.alert-row{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--bdr);margin-bottom:8px}
+.alert-time{font-family:var(--mono);font-size:13px;color:var(--sol);font-weight:700;min-width:48px;padding-top:2px}
+.alert-msg{font-size:12px;color:#94A3B8;line-height:1.4;margin-top:4px}
+
+/* Map */
+.map-box{border-radius:10px;overflow:hidden;border:1px solid var(--bdr);height:320px;background:var(--s2);position:relative}
+.map-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:#000c;color:#ccc;font-size:10px;padding:3px 10px;border-radius:4px;z-index:999;pointer-events:none}
+.leaflet-container{background:var(--s2)!important}
+
+/* Sources */
+.src{font-size:10px;padding:3px 10px;border-radius:5px;font-weight:500;display:inline-block;margin-right:8px;margin-bottom:8px}
+
+/* Status */
+.status{text-align:center;padding:40px 20px;color:var(--dim2);font-size:13px}
+
+@media(max-width:700px){
+  .cols{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr 1fr}
+  .kpi .val{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <div class="logo">☀</div>
+    <h1>Sol<b>Optim</b></h1>
+    <div class="badge">MVP Fase 1.5</div>
+  </div>
+
+  <div class="cols">
+    <!-- LEFT: Location -->
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div class="sec-h">Ubicacion</div>
+
+      <div>
+        <label>Codigo postal o localidad</label>
+        <div style="display:flex;gap:6px">
+          <input type="text" id="cp" placeholder="08401 o Granollers" style="flex:1">
+          <button class="btn-find" onclick="geocode()">Buscar</button>
+        </div>
+        <div id="geo-status" style="font-size:10px;margin-top:4px;min-height:14px"></div>
+      </div>
+
+      <div class="g2">
+        <div><label>Latitud</label><input type="number" id="lat" value="41.61" step="0.001"></div>
+        <div><label>Longitud</label><input type="number" id="lon" value="2.29" step="0.001"></div>
+      </div>
+
+      <div id="loc-name" style="font-size:13px;color:var(--sol);font-weight:600">Granollers</div>
+
+      <div class="map-box">
+        <div id="map" style="width:100%;height:100%"></div>
+        <div class="map-hint">Haz click en el mapa para pinear tu ubicacion</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Installation -->
+    <div class="card" style="display:flex;flex-direction:column">
+      <div class="sec-h">Instalacion</div>
+      <div class="g2">
+        <div><label>Potencia paneles</label><input type="number" id="kwp" value="5" step="0.5" min="0.5"><div class="unit">kWp instalados</div></div>
+        <div><label>Bateria</label><input type="number" id="bat" value="10" step="0.5" min="0"><div class="unit">kWh (0 = sin bateria)</div></div>
+        <div><label>Consumo diario</label><input type="number" id="cons" value="12" step="0.5" min="1"><div class="unit">kWh/dia medio</div></div>
+        <div><label>Fecha</label><input type="date" id="fecha"><div class="unit">Dia a optimizar</div></div>
+      </div>
+
+      <div style="margin-top:14px">
+        <label style="margin-bottom:8px">Configuracion rapida</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-s" onclick="preset(3,0,8)">Piso con placas</button>
+          <button class="btn-s" onclick="preset(5,10,12)">Casa + bateria</button>
+          <button class="btn-s" onclick="preset(8,15,18)">Casa grande</button>
+          <button class="btn-s" onclick="preset(15,30,40)">Pyme / Nave</button>
+        </div>
+      </div>
+
+      <div style="flex:1"></div>
+      <button class="btn" id="btn-go" onclick="run()" style="margin-top:16px;align-self:flex-start">Optimizar dia</button>
+    </div>
+  </div>
+
+  <div id="results" style="display:none"></div>
+  <div class="status" id="status-msg">Indica tu ubicacion, configura tu instalacion y pulsa <strong style="color:#94A3B8">Optimizar dia</strong>.</div>
+
+</div>
+
+<script>
+// ── Init ──
+const tom = new Date(Date.now()+864e5).toISOString().split('T')[0];
+document.getElementById('fecha').value = tom;
+
+// ── Leaflet Map ──
+const map = L.map('map',{zoomControl:true}).setView([41.61,2.29],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'© OpenStreetMap',maxZoom:19
+}).addTo(map);
+
+let marker = L.marker([41.61,2.29],{draggable:true}).addTo(map);
+
+function setLocation(lat,lon,name,zoom) {
+  document.getElementById('lat').value = lat.toFixed(4);
+  document.getElementById('lon').value = lon.toFixed(4);
+  if(name) document.getElementById('loc-name').textContent = name;
+  marker.setLatLng([lat,lon]);
+  map.setView([lat,lon],zoom||13);
+}
+
+map.on('click',function(e){
+  setLocation(e.latlng.lat,e.latlng.lng,'Ubicacion personalizada',map.getZoom());
+});
+
+marker.on('dragend',function(){
+  const p=marker.getLatLng();
+  setLocation(p.lat,p.lng,'Ubicacion personalizada',map.getZoom());
+});
+
+// ── Geocode ──
+async function geocode() {
+  const q = document.getElementById('cp').value.trim();
+  if (!q) return;
+  const st = document.getElementById('geo-status');
+  st.style.color = 'var(--dim)';
+  st.textContent = 'Buscando...';
+  try {
+    const isCP = /^\d{4,5}$/.test(q);
+    const url = isCP
+      ? `https://nominatim.openstreetmap.org/search?postalcode=${q}&country=Spain&format=json&limit=1&accept-language=es`
+      : `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+', Spain')}&format=json&limit=1&accept-language=es`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (d.length) {
+      const lat=parseFloat(d[0].lat), lon=parseFloat(d[0].lon);
+      const name = d[0].display_name.split(',').slice(0,2).join(', ');
+      setLocation(lat,lon,name,14);
+      st.style.color = 'var(--grn)';
+      st.textContent = 'Ubicacion encontrada';
+    } else {
+      st.style.color = '#F59E0B';
+      st.textContent = 'No encontrado. Haz click en el mapa para pinear.';
+    }
+  } catch(e) {
+    st.style.color = '#F59E0B';
+    st.textContent = 'Sin conexion. Haz click en el mapa para pinear.';
+  }
+}
+
+// Sync manual coord edits to map
+document.getElementById('lat').addEventListener('change',function(){
+  setLocation(+this.value,+document.getElementById('lon').value,null,map.getZoom());
+});
+document.getElementById('lon').addEventListener('change',function(){
+  setLocation(+document.getElementById('lat').value,+this.value,null,map.getZoom());
+});
+
+function preset(kw, b, c) {
+  document.getElementById('kwp').value = kw;
+  document.getElementById('bat').value = b;
+  document.getElementById('cons').value = c;
+}
+
+// ── Data ──
+const SIM_PRICES = [28,22,18,15,14,16,25,45,62,55,48,38,30,25,20,18,22,35,58,85,92,78,55,38];
+const CONS_PROF = [2.5,2,1.8,1.5,1.5,2,3,5,5.5,5,4.5,4,4.5,5,4.5,4,4,5,6.5,7,7.5,7,5.5,3.5];
+
+function getCons(daily) {
+  const t = CONS_PROF.reduce((a,b)=>a+b,0);
+  return CONS_PROF.map(p=>+((p/t)*daily).toFixed(3));
+}
+
+async function fetchSolar(lat,lon,kwp,dateStr) {
+  const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=shortwave_radiation&start_date=${dateStr}&end_date=${dateStr}&timezone=Europe/Madrid`);
+  if(!r.ok) throw new Error('fail');
+  const d = await r.json();
+  return (d.hourly?.shortwave_radiation||[]).slice(0,24).map(v=>+(((v||0)*kwp*.8)/1000).toFixed(3));
+}
+
+// ── Optimize ──
+function optimize(prices,solar,cons,bat) {
+  let soc=0; const mr=bat>0?bat*.5:0;
+  const ranked=[...Array(24).keys()].sort((a,b)=>prices[b]-prices[a]);
+  const dh=new Set(bat>0?ranked.slice(0,6):[]);
+  return Array.from({length:24},(_,h)=>{
+    const pk=prices[h]/1000,sol=solar[h],dem=cons[h],net=sol-dem;
+    let act='grid',sav=0,exp=0;
+    if(net>=0){act='solar';sav=dem*pk;let sur=net;
+      if(bat>0&&soc<bat){const c=Math.min(sur,mr,bat-soc);if(c>0){soc+=c;sur-=c;act='charge';}}
+      if(sur>0){exp=sur;sav+=sur*.06;if(act==='solar')act='export';}}
+    else{const def=-net;let gn=def;
+      if(bat>0&&dh.has(h)&&soc>0){const d=Math.min(gn,mr,soc);soc-=d;act='discharge';sav=(sol+d)*pk;}
+      else{sav=sol*pk;}}
+    return{hour:h,priceMwh:prices[h],priceKwh:+(prices[h]/1000).toFixed(4),solar:sol,consumption:dem,action:act,soc:+soc.toFixed(2),savings:+sav.toFixed(4),exported:+exp.toFixed(3)};
+  });
+}
+
+// ── Run ──
+async function run() {
+  const btn=document.getElementById('btn-go');
+  const res=document.getElementById('results');
+  const stm=document.getElementById('status-msg');
+  btn.disabled=true; btn.textContent='Calculando...';
+  stm.style.display='none';
+
+  const lat=+document.getElementById('lat').value;
+  const lon=+document.getElementById('lon').value;
+  const kwp=+document.getElementById('kwp').value;
+  const bat=+document.getElementById('bat').value;
+  const daily=+document.getElementById('cons').value;
+  const dateStr=document.getElementById('fecha').value;
+  const locName=document.getElementById('loc-name').textContent;
+
+  let solar, solarSrc;
+  try {
+    solar=await fetchSolar(lat,lon,kwp,dateStr);
+    solarSrc='Open-Meteo (datos reales)';
+  } catch {
+    const simR=[0,0,0,0,0,0,10,80,250,450,620,720,760,720,620,450,250,80,10,0,0,0,0,0];
+    solar=simR.map(r=>+((r*kwp*.8)/1000).toFixed(3));
+    solarSrc='Simulados (preview)';
+  }
+
+  const cons=getCons(daily);
+  const hours=optimize(SIM_PRICES,solar,cons,bat);
+
+  const totalSav=hours.reduce((s,h)=>s+h.savings,0);
+  const totalNoOpt=hours.reduce((s,h)=>s+h.consumption*h.priceKwh,0);
+  const totalSelf=hours.reduce((s,h)=>s+Math.min(h.solar,h.consumption),0);
+  const totalExp=hours.reduce((s,h)=>s+h.exported,0);
+  const gridCost=hours.filter(h=>h.action==='grid').reduce((s,h)=>s+Math.max(0,h.consumption-h.solar)*h.priceKwh,0);
+  const pct=totalNoOpt>0?((totalSav/totalNoOpt)*100).toFixed(0):0;
+
+  const ACT={solar:{l:'Autoconsumo',bg:'#EAB30825',c:'#EAB308'},charge:{l:'Carga bateria',bg:'#3B82F625',c:'#3B82F6'},discharge:{l:'Descarga bateria',bg:'#A855F7',c:'#fff'},export:{l:'Vertido a red',bg:'#22C55E25',c:'#22C55E'},grid:{l:'Compra de red',bg:'#EF444425',c:'#EF4444'}};
+  const AMSG={solar:'Tu produccion solar cubre el consumo. No necesitas hacer nada.',charge:'Excedente solar disponible. Activa la carga de bateria en tu inversor.',discharge:'Precio alto ({p} €/MWh). Descarga bateria para evitar comprar de red.',export:'Bateria llena y excedente solar. Vertiendo a red (~0.06 €/kWh).',grid:'Sin produccion solar. Consumiendo de red a {p} €/MWh.'};
+  const AEMOJI={solar:'☀️',charge:'🔋⬆️',discharge:'🔋⬇️',export:'📤',grid:'🔌'};
+
+  // ── Build chart SVG ──
+  const W=920,H=250,P=48,PR=56;
+  const mK=Math.max(...hours.map(d=>Math.max(d.solar,d.consumption)),.5)*1.15;
+  const mP=Math.max(...hours.map(d=>d.priceMwh),1);
+  const mS=bat||1;
+  const xf=i=>P+(i/23)*(W-P-PR);
+  const yK=v=>P+(1-v/mK)*(H-P*2);
+  const yP=v=>P+(1-v/mP)*(H-P*2);
+  const yS=v=>P+(1-v/mS)*(H-P*2);
+  const ln=pts=>pts.map((p,i)=>`${i?'L':'M'}${p[0]},${p[1]}`).join('');
+  const sP=hours.map((d,i)=>[xf(i),yK(d.solar)]);
+  const cP=hours.map((d,i)=>[xf(i),yK(d.consumption)]);
+  const pP=hours.map((d,i)=>[xf(i),yP(d.priceMwh)]);
+  const bP=hours.map((d,i)=>[xf(i),yS(d.soc)]);
+  const ac={solar:'#EAB308',charge:'#3B82F6',discharge:'#A855F7',export:'#22C55E',grid:'#EF4444'};
+
+  let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">`;
+  for(let i=0;i<=4;i++){const yy=P+(i/4)*(H-P*2);svg+=`<line x1="${P}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="#1E293B" stroke-width=".8"/><text x="${P-6}" y="${yy+4}" fill="#64748B" font-size="9" text-anchor="end" font-family="monospace">${(mK*(1-i/4)).toFixed(1)}</text><text x="${W-PR+6}" y="${yy+4}" fill="#3B82F680" font-size="9" text-anchor="start" font-family="monospace">${(mP*(1-i/4)).toFixed(0)}</text>`;}
+  for(let i=0;i<24;i+=3)svg+=`<text x="${xf(i)}" y="${H-6}" fill="#64748B" font-size="9" text-anchor="middle" font-family="monospace">${String(i).padStart(2,'0')}h</text>`;
+  svg+=`<text x="${P-6}" y="${P-12}" fill="#64748B" font-size="8" text-anchor="end">kW</text>`;
+  svg+=`<text x="${W-PR+6}" y="${P-12}" fill="#3B82F680" font-size="8" text-anchor="start">€/MWh</text>`;
+  svg+=`<path d="${ln(sP)}L${xf(23)},${yK(0)}L${xf(0)},${yK(0)}Z" fill="#EAB30810"/>`;
+  svg+=`<path d="${ln(pP)}" fill="none" stroke="#3B82F650" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  svg+=`<path d="${ln(sP)}" fill="none" stroke="#EAB308" stroke-width="2.5"/>`;
+  svg+=`<path d="${ln(cP)}" fill="none" stroke="#EF4444" stroke-width="2"/>`;
+  if(bat>0)svg+=`<path d="${ln(bP)}" fill="none" stroke="#A855F7" stroke-width="1.5" stroke-dasharray="6,3"/>`;
+  hours.forEach((d,i)=>svg+=`<circle cx="${xf(i)}" cy="${yK(d.solar)}" r="3" fill="${ac[d.action]||'#666'}" opacity=".8"/>`);
+  svg+=`</svg>`;
+
+  // ── Alerts ──
+  const alerts=hours.filter((h,i,a)=>i===0||h.action!==a[i-1].action);
+  let alertsHtml=alerts.map(h=>{
+    const a=ACT[h.action];
+    const msg=AMSG[h.action].replace('{p}',h.priceMwh.toFixed(0));
+    return`<div class="alert-row"><div class="alert-time">${String(h.hour).padStart(2,'0')}:00</div><div><span class="tag" style="background:${a.bg};color:${a.c};margin-bottom:4px">${AEMOJI[h.action]} ${a.l}</span><div class="alert-msg">${msg}</div></div></div>`;
+  }).join('');
+
+  // ── Table ──
+  let tbl=`<table><thead><tr><th>Hora</th><th>Precio</th><th>Solar</th><th>Consumo</th><th>Accion</th><th>Bateria</th><th>Ahorro</th></tr></thead><tbody>`;
+  hours.forEach(h=>{const a=ACT[h.action];tbl+=`<tr><td>${String(h.hour).padStart(2,'0')}:00</td><td>${h.priceMwh.toFixed(1)}</td><td style="color:var(--sol)">${h.solar.toFixed(2)}</td><td>${h.consumption.toFixed(2)}</td><td><span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span></td><td style="color:var(--pur)">${h.soc.toFixed(1)}</td><td style="color:${h.savings>0?'var(--grn)':'var(--dim2)'}">${h.savings.toFixed(3)} €</td></tr>`;});
+  tbl+=`</tbody></table>`;
+
+  // ── Render all ──
+  const solarReal=solarSrc.includes('reales');
+  res.innerHTML=`
+    <div style="margin-bottom:16px">
+      <span class="src" style="color:${solarReal?'var(--grn)':'#F59E0B'};background:${solarReal?'#22C55E12':'#F59E0B12'}">Solar: ${solarSrc}</span>
+      <span class="src" style="color:#F59E0B;background:#F59E0B12">Precios: simulados (backend + ESIOS para datos reales)</span>
+    </div>
+
+    <div class="g4">
+      <div class="card kpi"><div class="label">Ahorro estimado</div><div class="val" style="color:var(--grn)">${totalSav.toFixed(2)} €</div><div class="det">${pct}% menos vs. sin solar</div></div>
+      <div class="card kpi"><div class="label">Autoconsumo solar</div><div class="val" style="color:var(--sol)">${totalSelf.toFixed(1)} kWh</div><div class="det">Directamente del sol</div></div>
+      <div class="card kpi"><div class="label">Coste red</div><div class="val" style="color:var(--red)">${gridCost.toFixed(2)} €</div><div class="det">vs. ${totalNoOpt.toFixed(2)} € sin solar</div></div>
+      <div class="card kpi"><div class="label">Excedente vertido</div><div class="val" style="color:var(--blu)">${totalExp.toFixed(1)} kWh</div><div class="det">~${(totalExp*.06).toFixed(2)} € compensacion</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="sec-h">Curvas — ${locName} — ${dateStr}</div>
+      ${svg}
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:12px">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim)"><div style="width:9px;height:9px;border-radius:50%;background:var(--sol)"></div>Produccion solar</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim)"><div style="width:9px;height:9px;border-radius:50%;background:var(--red)"></div>Consumo</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim)"><div style="width:9px;height:9px;border-radius:50%;background:var(--blu)"></div>Precio pool</div>
+        ${bat>0?'<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim)"><div style="width:9px;height:9px;border-radius:50%;background:var(--pur)"></div>Bateria SOC</div>':''}
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;border-color:#EAB30830">
+      <div class="sec-h"><span style="color:var(--sol)">Fase 1.5</span> — Alertas Telegram que recibirias</div>
+      ${alertsHtml}
+      <div style="margin-top:14px;padding:10px 14px;background:var(--s2);border-radius:8px;font-size:12px;color:var(--dim);line-height:1.5">
+        En el servidor, estas alertas se envian a tu Telegram cada vez que cambia la accion. Recibes el plan completo cada manana + avisos en tiempo real hora a hora.
+      </div>
+    </div>
+
+    <div class="card" style="overflow-x:auto">
+      <div class="sec-h">Plan horario completo</div>
+      ${tbl}
+    </div>
+  `;
+  res.style.display='block';
+  btn.disabled=false; btn.textContent='Optimizar dia';
+}
+</script>
+</body>
+</html>
