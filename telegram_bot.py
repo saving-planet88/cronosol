@@ -137,14 +137,17 @@ ACTION_MSG = {
 }
 
 
+KM_PER_KG_CO2 = 1 / 0.13  # equivalencia orientativa: ~0.13 kg CO2 por km en coche de gasolina medio
+
 def format_plan_message(plan: dict, u: dict, target_date: date, intro: str = "☀️ *Plan de hoy*") -> str:
     co2 = plan["total_solar_self_consumed_kwh"] * ES_GRID_CO2_KG_PER_KWH
+    km_equiv = co2 * KM_PER_KG_CO2
     lines = [
         f"{intro} — {target_date}",
         f"📍 {u.get('location', '?')} | {u['kwp']} kWp | {u['battery']} kWh batería",
         "",
         f"💶 *{plan['total_savings_eur']:.2f} € de ahorro estimado*",
-        f"🌍 ~{co2:.1f} kg CO₂ evitados (estimado)",
+        f"🌍 ~{co2:.1f} kg CO₂ evitados — como no coger el coche {km_equiv:.0f} km (estimado)",
         "",
     ]
     prev_action = None
@@ -156,6 +159,11 @@ def format_plan_message(plan: dict, u: dict, target_date: date, intro: str = "�
             prev_action = h["action"]
     lines.append("")
     lines.append(f"📊 [Ver informe completo con gráficos]({report_link(u, target_date)})")
+    inv = u.get("inverter")
+    if inv:
+        lines.append(f"🔧 [Cómo programar tu {INVERTER_LABELS[inv]}]({WEB_PUBLIC_URL}/tutoriales#{inv})")
+    else:
+        lines.append(f"🔧 [Guías para programar tu inversor]({WEB_PUBLIC_URL}/tutoriales)")
     return "\n".join(lines)
 
 
@@ -201,14 +209,29 @@ STEP_PROMPTS = {
     "kwp": "☀️ ¿Cuántos *kWp* tienes instalados? (ej. 5)\n\nO escribe /plan para usar 5 kWp por defecto.",
     "battery": "🔋 ¿Capacidad de tu *batería* en kWh? (escribe 0 si no tienes)\n\nO escribe /plan para usar 10 kWh por defecto.",
     "consumption": "⚡ ¿Tu *consumo medio diario* en kWh? (ej. 12)\n\nO escribe /plan para usar 12 kWh por defecto.",
+    "inverter": "🔌 Última pregunta: ¿qué *marca de inversor* tienes — Huawei, Fronius, Victron u otra?\n\nAsí te paso el enlace directo a cómo programar las franjas horarias. Escribe /plan para saltarte esto.",
 }
-STEP_ORDER = ["location", "kwp", "battery", "consumption"]
+STEP_ORDER = ["location", "kwp", "battery", "consumption", "inverter"]
+
+INVERTER_LABELS = {
+    "huawei": "Huawei FusionSolar", "fronius": "Fronius Solar.web",
+    "victron": "Victron VRM", "otro": "tu inversor",
+}
+
+
+def normalize_inverter(text: str) -> str:
+    t = text.lower()
+    for key in ("huawei", "fronius", "victron"):
+        if key in t:
+            return key
+    return "otro"
 
 
 def default_user():
     return {
         "kwp": 5, "battery": 10, "consumption": 12,
         "lat": 41.61, "lon": 2.29, "location": "Granollers",
+        "inverter": None,
         "last_action": None, "awaiting": "location",
     }
 
@@ -276,7 +299,7 @@ async def handle_message(msg, users):
         await send_message(
             chat_id,
             "☀️ *CronoSol* — Optimiza tu autoconsumo solar\n\n"
-            "Te hago 4 preguntas rápidas y ya está. Puedes saltarte cualquiera "
+            "Te hago 5 preguntas rápidas y ya está. Puedes saltarte cualquiera "
             "escribiendo /plan para usar valores por defecto.\n\n"
             "Primero: ¿dónde está tu instalación? Comparte tu ubicación o "
             "escribe el nombre de tu localidad.",
@@ -329,6 +352,17 @@ async def handle_message(msg, users):
             await send_message(chat_id, "Formato: /consumo 12")
         return
 
+    if text.startswith("/marca"):
+        parts = text.split(maxsplit=1)
+        if len(parts) < 2:
+            await send_message(chat_id, "Formato: /marca huawei (o fronius, victron, otro)")
+            return
+        inv = normalize_inverter(parts[1])
+        u["inverter"] = inv
+        save_users(users)
+        await send_message(chat_id, f"🔌 Inversor: {INVERTER_LABELS[inv]}")
+        return
+
     if text.startswith("/plan"):
         u["awaiting"] = None
         save_users(users)
@@ -341,7 +375,8 @@ async def handle_message(msg, users):
             f"📍 {u.get('location', '?')} ({u['lat']}, {u['lon']})\n"
             f"☀️ Paneles: {u['kwp']} kWp\n"
             f"🔋 Batería: {u['battery']} kWh\n"
-            f"⚡ Consumo: {u['consumption']} kWh/día"
+            f"⚡ Consumo: {u['consumption']} kWh/día\n"
+            f"🔌 Inversor: {INVERTER_LABELS.get(u.get('inverter'), 'no indicado')}"
         )
         return
 
@@ -366,6 +401,13 @@ async def handle_message(msg, users):
         label = {"kwp": f"☀️ Paneles: {num} kWp", "battery": f"🔋 Batería: {num} kWh", "consumption": f"⚡ Consumo: {num} kWh/día"}[awaiting]
         await send_message(chat_id, label)
         await advance_step(chat_id, u, users, awaiting)
+        return
+
+    if awaiting == "inverter":
+        inv = normalize_inverter(text)
+        u["inverter"] = inv
+        await send_message(chat_id, f"🔌 Inversor: {INVERTER_LABELS[inv]}")
+        await advance_step(chat_id, u, users, "inverter")
         return
 
     await send_message(chat_id, "No te he entendido. Escribe /plan para ver tu plan de hoy, o /start para reconfigurar.")

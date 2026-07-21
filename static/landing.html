@@ -78,6 +78,25 @@ section{padding:64px 0}
 .impact-card.money .n{color:var(--grn)}
 .impact-card.co2 .n{color:#7FD9C9}
 .impact-note{grid-column:1/-1;font-size:12.5px;color:var(--dim2);text-align:center;margin-top:4px}
+.impact-equiv{grid-column:1/-1;display:flex;gap:22px;justify-content:center;flex-wrap:wrap;font-size:13.5px;color:#CBD5E1;margin-top:-4px}
+.impact-equiv .eq{display:flex;align-items:center;gap:6px}
+.impact-method{grid-column:1/-1;font-size:13px;color:#94A3B8;background:var(--s1);border:1px solid var(--bdr);border-radius:12px;padding:16px 18px;line-height:1.6}
+
+/* Alerts demo */
+.alerts-demo{display:grid;grid-template-columns:.9fr 1.1fr;gap:36px;align-items:center}
+@media(max-width:800px){.alerts-demo{grid-template-columns:1fr}}
+.phone-mock{background:#17212b;border:1px solid var(--bdr);border-radius:20px;padding:16px;max-width:340px;margin:0 auto;box-shadow:0 20px 50px -20px #000a}
+.tg-bubble{background:#1e2c3a;border-radius:14px;padding:14px 16px;font-size:12.5px}
+.tg-line{margin-bottom:6px;color:#dfe6ec}
+.tg-line.b{font-weight:700;color:#fff}
+.tg-line.dim{color:#8a97a3;font-size:11.5px}
+.tg-line.grn{color:#7cd992}
+.tg-line.co2{color:#7FD9C9;font-size:11.5px}
+.tg-line.mono{font-family:var(--mono);font-size:11px;color:#c9d3db}
+.tg-line.link{color:#6ab7f5;font-size:11.5px}
+.tg-gap{height:6px}
+.alerts-text p{font-size:14.5px;color:#94A3B8;margin-bottom:14px}
+.alerts-text strong{color:var(--tx)}
 
 /* CTA band */
 .ctaband{background:linear-gradient(135deg,#1a2332,#111827);border:1px solid var(--bdr);border-radius:24px;padding:48px 32px;text-align:center}
@@ -99,7 +118,9 @@ footer{padding:32px 0 40px;text-align:center;font-size:12px;color:var(--dim2)}
     <div class="brand">Crono<b>Sol</b></div>
     <div class="nav-links">
       <a href="#como-funciona">Cómo funciona</a>
+      <a href="#alertas">Alertas</a>
       <a href="#impacto">Impacto</a>
+      <a href="/tutoriales">Tutoriales</a>
       <a href="/optimizar">Calculadora</a>
     </div>
   </div>
@@ -161,6 +182,33 @@ footer{padding:32px 0 40px;text-align:center;font-size:12px;color:var(--dim2)}
     </div>
   </section>
 
+  <section id="alertas">
+    <div class="sec-kicker">Un mensaje, no cuatro</div>
+    <div class="sec-h">Así son las alertas de Telegram</div>
+    <div class="alerts-demo">
+      <div class="phone-mock">
+        <div class="tg-bubble">
+          <div class="tg-line b">☀️ Plan de hoy — 2026-07-22</div>
+          <div class="tg-line dim">📍 Granollers | 5 kWp | 10 kWh batería</div>
+          <div class="tg-gap"></div>
+          <div class="tg-line grn b">💶 1,91 € de ahorro estimado</div>
+          <div class="tg-line co2">🌍 ~1,5 kg CO₂ evitados — como no coger el coche 12 km</div>
+          <div class="tg-gap"></div>
+          <div class="tg-line mono">09:00 🔋⬆️ Carga la batería — hay excedente solar</div>
+          <div class="tg-line mono">19:00 🔋⬇️ Descarga la batería — precio alto (152 €/MWh)</div>
+          <div class="tg-gap"></div>
+          <div class="tg-line link">📊 Ver informe completo con gráficos</div>
+          <div class="tg-line link">🔧 Cómo programar tu Huawei FusionSolar</div>
+        </div>
+      </div>
+      <div class="alerts-text">
+        <p><strong>Un solo mensaje por la mañana</strong>, no una alerta cada hora que nadie tiene tiempo de leer. Programas tu inversor una vez y te olvidas el resto del día.</p>
+        <p>El ahorro en € y el CO₂ evitado van siempre juntos — y con enlace directo a cómo programar las franjas horarias según la marca de tu inversor.</p>
+        <a class="calc-cta" href="https://t.me/Cronosolar_bot" target="_blank" style="display:inline-block;width:auto;padding:10px 20px">Probar el bot →</a>
+      </div>
+    </div>
+  </section>
+
   <section id="impacto">
     <div class="sec-kicker">Impacto primero</div>
     <div class="sec-h">El ahorro es la prueba de que haces lo correcto</div>
@@ -172,6 +220,13 @@ footer{padding:32px 0 40px;text-align:center;font-size:12px;color:var(--dim2)}
       <div class="impact-card co2">
         <div class="n">340 kg</div>
         <div class="l">CO₂ evitado al año para esa misma instalación, por desplazar consumo de red a autoconsumo solar</div>
+      </div>
+      <div class="impact-equiv">
+        <div class="eq"><span>🚗</span> ≈ 2.600 km sin coger el coche</div>
+        <div class="eq"><span>🌳</span> ≈ 15 árboles creciendo un año</div>
+      </div>
+      <div class="impact-method">
+        <strong>¿De dónde sale este número?</strong> Multiplicamos los kWh que autoconsumes directamente del sol por el factor medio de emisión de la red eléctrica española (~0,19 kg CO₂/kWh) — es decir, la energía que ya no compras a la red porque la generas y usas tú mismo.
       </div>
       <div class="impact-note">Cifras orientativas — usa la calculadora de arriba para tu caso concreto. No es solo una herramienta de ahorro: es una herramienta climática.</div>
     </div>

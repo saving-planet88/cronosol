@@ -364,4 +364,8 @@ async def serve_landing():
 async def serve_optimizar():
     return FileResponse("static/index.html")
 
+@app.get("/tutoriales")
+async def serve_tutoriales():
+    return FileResponse("static/tutoriales.html")
+
 app.mount("/static", StaticFiles(directory="static"), name="static")

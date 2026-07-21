@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CronoSol — Cómo programar tu inversor</title>
+<meta name="description" content="Guías paso a paso para programar las franjas de carga y descarga de batería en Huawei FusionSolar, Fronius Solar.web y Victron VRM.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+:root {
+  --bg:#0B0F19; --s1:#111827; --s2:#1E293B; --bdr:#1E293B;
+  --tx:#E2E8F0; --dim:#64748B; --dim2:#475569;
+  --sol:#EAB308; --grn:#22C55E; --red:#EF4444; --blu:#3B82F6; --pur:#A855F7;
+  --ff:'DM Sans',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--ff);background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 60px}
+a{color:inherit}
+
+.nav{display:flex;align-items:center;gap:10px;padding:20px 0 8px}
+.logo{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#EAB308,#F59E0B);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px #EAB30840;flex-shrink:0}
+.brand{font-size:19px;font-weight:800;letter-spacing:-.5px;text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand b{color:var(--sol)}
+.back{margin-left:auto;font-size:13px;color:var(--dim);text-decoration:none}
+.back:hover{color:var(--tx)}
+
+.hdr{padding:24px 0 8px}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--sol);margin-bottom:12px}
+h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-1px;margin-bottom:14px}
+.intro{color:#94A3B8;font-size:15px;max-width:600px;margin-bottom:8px}
+.note{font-size:12.5px;color:var(--dim2);background:var(--s1);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px;margin:20px 0 32px}
+
+.brands{display:flex;flex-direction:column;gap:12px}
+.brand-card{background:var(--s1);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;scroll-margin-top:20px}
+.brand-head{display:flex;align-items:center;gap:12px;padding:18px 20px;cursor:pointer;user-select:none}
+.brand-head .icon{width:34px;height:34px;border-radius:9px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.brand-head h2{font-size:16px;font-weight:700;flex:1}
+.brand-head .chev{color:var(--dim);transition:transform .2s ease;font-size:13px}
+.brand-card.open .chev{transform:rotate(180deg)}
+.brand-body{max-height:0;overflow:hidden;transition:max-height .25s ease}
+.brand-card.open .brand-body{max-height:900px}
+.brand-body-in{padding:0 20px 20px}
+.brand-body ol{padding-left:20px;margin-bottom:12px}
+.brand-body li{font-size:14px;color:#CBD5E1;margin-bottom:8px;line-height:1.55}
+.brand-warn{font-size:12.5px;color:#F59E0B;background:#F59E0B12;border-radius:8px;padding:8px 12px;margin-top:4px}
+
+.ctaband{margin-top:40px;background:linear-gradient(135deg,#1a2332,#111827);border:1px solid var(--bdr);border-radius:20px;padding:32px;text-align:center}
+.ctaband p{color:#94A3B8;font-size:14px;margin-bottom:18px}
+.btn-primary{display:inline-block;padding:12px 26px;background:linear-gradient(135deg,#EAB308,#CA8A04);color:#0B0F19;border:none;border-radius:9px;font-family:var(--ff);font-size:14px;font-weight:800;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav">
+    <a class="brand" href="/"><div class="logo">☀</div>Crono<b>Sol</b></a>
+    <a class="back" href="/optimizar">← Volver a la calculadora</a>
+  </div>
+
+  <div class="hdr">
+    <div class="kicker">Configuración</div>
+    <h1>Cómo programar tu inversor</h1>
+    <p class="intro">CronoSol te dice a qué hora conviene cargar o descargar la batería — pero quien ejecuta ese plan es tu inversor. Aquí tienes los pasos para programar las franjas horarias según tu marca.</p>
+  </div>
+
+  <div class="note">⚠️ Los menús exactos pueden variar según el modelo y la versión de firmware/app de tu inversor. Si algo no coincide, contacta con tu instalador — puede que la función esté bloqueada de fábrica.</div>
+
+  <div class="brands">
+
+    <div class="brand-card" id="huawei">
+      <div class="brand-head" onclick="toggle('huawei')">
+        <div class="icon">🔌</div>
+        <h2>Huawei FusionSolar</h2>
+        <div class="chev">▾</div>
+      </div>
+      <div class="brand-body"><div class="brand-body-in">
+        <ol>
+          <li>Abre la app <strong>FusionSolar</strong> y entra en tu planta.</li>
+          <li>Ve a <strong>Ajustes</strong> (⚙️) → busca la gestión de batería, normalmente llamada <strong>TOU</strong> (Time of Use) o "Estrategia de carga".</li>
+          <li>Añade un tramo horario de <strong>carga</strong> en las horas que te indique el plan de CronoSol (ej. 10:00–15:00).</li>
+          <li>Añade un tramo de <strong>descarga</strong> en las horas caras que te marquemos (ej. 19:00–23:00).</li>
+          <li>Guarda los cambios. Algunos modelos tardan unos minutos en aplicarlos al inversor físico.</li>
+        </ol>
+      </div></div>
+    </div>
+
+    <div class="brand-card" id="fronius">
+      <div class="brand-head" onclick="toggle('fronius')">
+        <div class="icon">🔌</div>
+        <h2>Fronius Solar.web</h2>
+        <div class="chev">▾</div>
+      </div>
+      <div class="brand-body"><div class="brand-body-in">
+        <ol>
+          <li>Entra en <strong>solar.web</strong> con tu cuenta de usuario o instalador.</li>
+          <li>Ve a tu planta → <strong>Configuración avanzada</strong> → <strong>Gestión de batería</strong> (Battery Management).</li>
+          <li>Busca la opción de carga/descarga forzada por horario, si tu modelo la soporta.</li>
+          <li>Define las franjas horarias según el plan que te dé CronoSol.</li>
+        </ol>
+        <div class="brand-warn">No todos los inversores Fronius domésticos traen esta opción activada de fábrica — si no la ves, pide a tu instalador que la habilite.</div>
+      </div></div>
+    </div>
+
+    <div class="brand-card" id="victron">
+      <div class="brand-head" onclick="toggle('victron')">
+        <div class="icon">🔌</div>
+        <h2>Victron VRM</h2>
+        <div class="chev">▾</div>
+      </div>
+      <div class="brand-body"><div class="brand-body-in">
+        <ol>
+          <li>Entra en <strong>vrm.victronenergy.com</strong>.</li>
+          <li>Ve a tu instalación → configuración del dispositivo GX → <strong>ESS</strong> (Energy Storage System).</li>
+          <li>En "Configuración programada" (Scheduled charging), añade las franjas horarias que te indique CronoSol.</li>
+          <li>Guarda — Victron suele aplicar los cambios casi al instante.</li>
+        </ol>
+      </div></div>
+    </div>
+
+    <div class="brand-card" id="otro">
+      <div class="brand-head" onclick="toggle('otro')">
+        <div class="icon">🔧</div>
+        <h2>Otra marca / genérico</h2>
+        <div class="chev">▾</div>
+      </div>
+      <div class="brand-body"><div class="brand-body-in">
+        <ol>
+          <li>Busca en el manual o la app de tu inversor los términos <strong>"Time of Use"</strong>, "gestión de batería" o "franjas horarias".</li>
+          <li>La mayoría de inversores modernos con batería permiten programar cuándo cargar y descargar según el reloj.</li>
+          <li>Si no encuentras la opción, contacta con tu instalador — puede estar bloqueada de fábrica.</li>
+          <li>¿Nos cuentas qué marca tienes? Escríbenos al bot con <code>/marca &lt;nombre&gt;</code> y añadiremos una guía específica.</li>
+        </ol>
+      </div></div>
+    </div>
+
+  </div>
+
+  <div class="ctaband">
+    <p>¿Aún no tienes tu plan de hoy?</p>
+    <a class="btn-primary" href="/optimizar">Abrir la calculadora →</a>
+  </div>
+</div>
+
+<script>
+function toggle(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+// Si llegamos con un hash (#huawei, #fronius...), abre esa tarjeta y desplaza hasta ella
+const hash = location.hash.replace('#','');
+if (hash && document.getElementById(hash)) {
+  const el = document.getElementById(hash);
+  el.classList.add('open');
+  setTimeout(() => el.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+}
+</script>
+</body>
+</html>
