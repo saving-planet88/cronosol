@@ -156,6 +156,18 @@ tr:hover td{background:#1E293B30}
 const tom = new Date(Date.now()+864e5).toISOString().split('T')[0];
 document.getElementById('fecha').value = tom;
 
+// ── Prefill desde la URL (enlace de informe compartido por el bot de Telegram) ──
+const qp = new URLSearchParams(location.search);
+const fromLink = qp.has('lat') && qp.has('lon');
+if (fromLink) {
+  document.getElementById('lat').value = qp.get('lat');
+  document.getElementById('lon').value = qp.get('lon');
+  if (qp.has('kwp')) document.getElementById('kwp').value = qp.get('kwp');
+  if (qp.has('battery')) document.getElementById('bat').value = qp.get('battery');
+  if (qp.has('consumption')) document.getElementById('cons').value = qp.get('consumption');
+  if (qp.has('date')) document.getElementById('fecha').value = qp.get('date');
+}
+
 // ── Leaflet Map ──
 const map = L.map('map',{zoomControl:true}).setView([41.61,2.29],13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
@@ -170,6 +182,10 @@ function setLocation(lat,lon,name,zoom) {
   if(name) document.getElementById('loc-name').textContent = name;
   marker.setLatLng([lat,lon]);
   map.setView([lat,lon],zoom||13);
+}
+
+if (fromLink) {
+  setLocation(+document.getElementById('lat').value, +document.getElementById('lon').value, 'Tu ubicación', 13);
 }
 
 map.on('click',function(e){
@@ -225,39 +241,21 @@ function preset(kw, b, c) {
   document.getElementById('cons').value = c;
 }
 
-// ── Data ──
-const SIM_PRICES = [28,22,18,15,14,16,25,45,62,55,48,38,30,25,20,18,22,35,58,85,92,78,55,38];
-const CONS_PROF = [2.5,2,1.8,1.5,1.5,2,3,5,5.5,5,4.5,4,4.5,5,4.5,4,4,5,6.5,7,7.5,7,5.5,3.5];
-
-function getCons(daily) {
-  const t = CONS_PROF.reduce((a,b)=>a+b,0);
-  return CONS_PROF.map(p=>+((p/t)*daily).toFixed(3));
-}
-
-async function fetchSolar(lat,lon,kwp,dateStr) {
-  const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=shortwave_radiation&start_date=${dateStr}&end_date=${dateStr}&timezone=Europe/Madrid`);
-  if(!r.ok) throw new Error('fail');
-  const d = await r.json();
-  return (d.hourly?.shortwave_radiation||[]).slice(0,24).map(v=>+(((v||0)*kwp*.8)/1000).toFixed(3));
-}
-
-// ── Optimize ──
-function optimize(prices,solar,cons,bat) {
-  let soc=0; const mr=bat>0?bat*.5:0;
-  const ranked=[...Array(24).keys()].sort((a,b)=>prices[b]-prices[a]);
-  const dh=new Set(bat>0?ranked.slice(0,6):[]);
-  return Array.from({length:24},(_,h)=>{
-    const pk=prices[h]/1000,sol=solar[h],dem=cons[h],net=sol-dem;
-    let act='grid',sav=0,exp=0;
-    if(net>=0){act='solar';sav=dem*pk;let sur=net;
-      if(bat>0&&soc<bat){const c=Math.min(sur,mr,bat-soc);if(c>0){soc+=c;sur-=c;act='charge';}}
-      if(sur>0){exp=sur;sav+=sur*.06;if(act==='solar')act='export';}}
-    else{const def=-net;let gn=def;
-      if(bat>0&&dh.has(h)&&soc>0){const d=Math.min(gn,mr,soc);soc-=d;act='discharge';sav=(sol+d)*pk;}
-      else{sav=sol*pk;}}
-    return{hour:h,priceMwh:prices[h],priceKwh:+(prices[h]/1000).toFixed(4),solar:sol,consumption:dem,action:act,soc:+soc.toFixed(2),savings:+sav.toFixed(4),exported:+exp.toFixed(3)};
+// ── Optimize: llamada real a la API (mismo motor que usa el bot de Telegram) ──
+async function fetchPlan(lat,lon,kwp,bat,daily,dateStr) {
+  const r = await fetch(`/api/optimize?target_date=${dateStr}`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({latitude:lat, longitude:lon, kwp, battery_kwh:bat, daily_consumption_kwh:daily}),
   });
+  if(!r.ok) {
+    const err = await r.json().catch(()=>({detail:'Error desconocido'}));
+    throw new Error(err.detail || `HTTP ${r.status}`);
+  }
+  return r.json();
 }
+
+const ACTION_MAP = {battery_charge:'charge', battery_discharge:'discharge'};
 
 // ── Run ──
 async function run() {
@@ -275,24 +273,29 @@ async function run() {
   const dateStr=document.getElementById('fecha').value;
   const locName=document.getElementById('loc-name').textContent;
 
-  let solar, solarSrc;
+  let api;
   try {
-    solar=await fetchSolar(lat,lon,kwp,dateStr);
-    solarSrc='Open-Meteo (datos reales)';
-  } catch {
-    const simR=[0,0,0,0,0,0,10,80,250,450,620,720,760,720,620,450,250,80,10,0,0,0,0,0];
-    solar=simR.map(r=>+((r*kwp*.8)/1000).toFixed(3));
-    solarSrc='Simulados (preview)';
+    api = await fetchPlan(lat,lon,kwp,bat,daily,dateStr);
+  } catch(e) {
+    stm.style.display='block';
+    stm.textContent = 'No se ha podido calcular el plan: ' + e.message;
+    btn.disabled=false; btn.textContent='Optimizar dia';
+    return;
   }
 
-  const cons=getCons(daily);
-  const hours=optimize(SIM_PRICES,solar,cons,bat);
+  const hours = api.hours.map(h=>({
+    hour:h.hour, priceMwh:h.price_eur_mwh, priceKwh:h.price_eur_kwh,
+    solar:h.solar_kw, consumption:h.consumption_kw,
+    action: ACTION_MAP[h.action] || h.action,
+    soc:h.battery_soc_kwh, savings:h.savings_eur,
+    exported: h.action==='export' ? Math.max(0, h.solar_kw - h.consumption_kw) : 0,
+  }));
 
-  const totalSav=hours.reduce((s,h)=>s+h.savings,0);
-  const totalNoOpt=hours.reduce((s,h)=>s+h.consumption*h.priceKwh,0);
-  const totalSelf=hours.reduce((s,h)=>s+Math.min(h.solar,h.consumption),0);
-  const totalExp=hours.reduce((s,h)=>s+h.exported,0);
-  const gridCost=hours.filter(h=>h.action==='grid').reduce((s,h)=>s+Math.max(0,h.consumption-h.solar)*h.priceKwh,0);
+  const totalSav = api.total_savings_eur;
+  const totalNoOpt = api.total_grid_cost_no_optim_eur;
+  const totalSelf = api.total_solar_self_consumed_kwh;
+  const totalExp = api.total_exported_kwh;
+  const gridCost = api.total_grid_cost_eur;
   const pct=totalNoOpt>0?((totalSav/totalNoOpt)*100).toFixed(0):0;
 
   const ACT={solar:{l:'Autoconsumo',bg:'#EAB30825',c:'#EAB308'},charge:{l:'Carga bateria',bg:'#3B82F625',c:'#3B82F6'},discharge:{l:'Descarga bateria',bg:'#A855F7',c:'#fff'},export:{l:'Vertido a red',bg:'#22C55E25',c:'#22C55E'},grid:{l:'Compra de red',bg:'#EF444425',c:'#EF4444'}};
@@ -342,11 +345,10 @@ async function run() {
   tbl+=`</tbody></table>`;
 
   // ── Render all ──
-  const solarReal=solarSrc.includes('reales');
   res.innerHTML=`
     <div style="margin-bottom:16px">
-      <span class="src" style="color:${solarReal?'var(--grn)':'#F59E0B'};background:${solarReal?'#22C55E12':'#F59E0B12'}">Solar: ${solarSrc}</span>
-      <span class="src" style="color:#F59E0B;background:#F59E0B12">Precios: simulados (backend + ESIOS para datos reales)</span>
+      <span class="src" style="color:var(--grn);background:#22C55E12">☀️ Solar: Open-Meteo (datos reales)</span>
+      <span class="src" style="color:var(--grn);background:#22C55E12">💶 Precios: ESIOS/REE (datos reales)</span>
     </div>
 
     <div class="g4">
@@ -383,6 +385,9 @@ async function run() {
   res.style.display='block';
   btn.disabled=false; btn.textContent='Optimizar dia';
 }
+
+// Si llegamos desde el enlace del bot de Telegram, calcula automaticamente
+if (fromLink) run();
 </script>
 </body>
 </html>
