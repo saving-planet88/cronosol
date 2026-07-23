@@ -121,6 +121,19 @@ tr:hover td{background:var(--lemon-lite)}
         <div><label>Bateria</label><input type="number" id="bat" value="10" step="0.5" min="0"><div class="unit">kWh (0 = sin bateria)</div></div>
         <div><label>Consumo diario</label><input type="number" id="cons" value="12" step="0.5" min="1"><div class="unit">kWh/dia medio</div></div>
         <div><label>Fecha</label><input type="date" id="fecha"><div class="unit">Dia a optimizar</div></div>
+        <div>
+          <label>Orientacion del tejado</label>
+          <select id="azimuth">
+            <option value="180" selected>Sur</option>
+            <option value="135">Sureste</option>
+            <option value="225">Suroeste</option>
+            <option value="90">Este</option>
+            <option value="270">Oeste</option>
+            <option value="0">Norte</option>
+          </select>
+          <div class="unit">Afecta a que horas produces mas</div>
+        </div>
+        <div><label>Inclinacion paneles</label><input type="number" id="tilt" value="30" step="1" min="0" max="90"><div class="unit">grados (0 = tejado plano)</div></div>
       </div>
 
       <div style="margin-top:14px">
@@ -162,6 +175,8 @@ if (fromLink) {
   if (qp.has('battery')) document.getElementById('bat').value = qp.get('battery');
   if (qp.has('consumption')) document.getElementById('cons').value = qp.get('consumption');
   if (qp.has('date')) document.getElementById('fecha').value = qp.get('date');
+  if (qp.has('tilt')) document.getElementById('tilt').value = qp.get('tilt');
+  if (qp.has('azimuth')) document.getElementById('azimuth').value = qp.get('azimuth');
 }
 
 // ── Leaflet Map ──
@@ -238,11 +253,11 @@ function preset(kw, b, c) {
 }
 
 // ── Optimize: llamada real a la API (mismo motor que usa el bot de Telegram) ──
-async function fetchPlan(lat,lon,kwp,bat,daily,dateStr) {
+async function fetchPlan(lat,lon,kwp,bat,daily,dateStr,tilt,azimuth) {
   const r = await fetch(`/api/optimize?target_date=${dateStr}`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({latitude:lat, longitude:lon, kwp, battery_kwh:bat, daily_consumption_kwh:daily}),
+    body: JSON.stringify({latitude:lat, longitude:lon, kwp, battery_kwh:bat, daily_consumption_kwh:daily, tilt, azimuth}),
   });
   if(!r.ok) {
     const err = await r.json().catch(()=>({detail:'Error desconocido'}));
@@ -268,10 +283,12 @@ async function run() {
   const daily=+document.getElementById('cons').value;
   const dateStr=document.getElementById('fecha').value;
   const locName=document.getElementById('loc-name').textContent;
+  const tilt=+document.getElementById('tilt').value;
+  const azimuth=+document.getElementById('azimuth').value;
 
   let api;
   try {
-    api = await fetchPlan(lat,lon,kwp,bat,daily,dateStr);
+    api = await fetchPlan(lat,lon,kwp,bat,daily,dateStr,tilt,azimuth);
   } catch(e) {
     stm.style.display='block';
     stm.textContent = 'No se ha podido calcular el plan: ' + e.message;

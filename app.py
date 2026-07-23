@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 load_dotenv()
 
@@ -75,13 +75,13 @@ app.add_middleware(
 # ── Modelos ──────────────────────────────────────────────
 
 class InstallationParams(BaseModel):
-    latitude: float
-    longitude: float
-    kwp: float  # kW pico instalados
-    battery_kwh: float = 0.0  # capacidad batería (0 = sin batería)
-    daily_consumption_kwh: float = 10.0  # consumo medio diario
-    tilt: float = 30.0  # inclinación paneles
-    azimuth: float = 180.0  # orientación (180 = sur)
+    latitude: float = Field(ge=-90, le=90)
+    longitude: float = Field(ge=-180, le=180)
+    kwp: float = Field(gt=0, le=1000)  # kW pico instalados
+    battery_kwh: float = Field(default=0.0, ge=0, le=1000)  # capacidad batería (0 = sin batería)
+    daily_consumption_kwh: float = Field(default=10.0, gt=0, le=1000)  # consumo medio diario
+    tilt: float = Field(default=30.0, ge=0, le=90)  # inclinación paneles
+    azimuth: float = Field(default=180.0, ge=0, le=360)  # orientación (180 = sur, 0/360 = norte)
 
 
 class HourlySlot(BaseModel):
@@ -155,10 +155,26 @@ async def fetch_esios_prices(target_date: date) -> list[float]:
         h = dt.hour
         hourly.setdefault(h, []).append(v["value"])
 
+    missing_hours = [h for h in range(24) if h not in hourly]
+    if len(missing_hours) == 24:
+        # ESIOS respondió 200 pero sin ningún precio para el día — ya ocurrió antes
+        # (geo_id inválido devolvía values:[] con 200 OK). No fabricamos datos: fallamos alto.
+        raise HTTPException(
+            status_code=502,
+            detail=f"ESIOS no tiene precios publicados para {target_date} todavía. "
+                    "El día D+1 suele publicarse sobre las 14:00 (hora española)."
+        )
+
+    known_avg = sum(sum(v) / len(v) for v in hourly.values()) / len(hourly)
     prices = []
     for h in range(24):
-        vals = hourly.get(h, [])
-        prices.append(sum(vals) / len(vals) if vals else 0.0)
+        vals = hourly.get(h)
+        if vals:
+            prices.append(sum(vals) / len(vals))
+        else:
+            # Hora suelta sin dato (p.ej. cambio de horario): usamos la media del día,
+            # NUNCA 0 — un precio de 0€ falso sesgaría al optimizador a preferir esa hora.
+            prices.append(known_avg)
 
     return prices
 
@@ -257,13 +273,27 @@ async def fetch_solar_forecast(
     dni_list = hourly.get("direct_normal_irradiance", [])
     dhi_list = hourly.get("diffuse_radiation", [])
 
+    # Open-Meteo debería devolver 24 puntos horarios para un solo día. Si la
+    # respuesta viene incompleta (cambio de formato, corte parcial, etc.) NO
+    # rellenamos con producción 0 en silencio: eso simularía un día nublado
+    # falso y le diría al usuario que no merece la pena cargar la batería.
+    if len(times) < 24 or len(ghi_list) < 24 or len(dni_list) < 24 or len(dhi_list) < 24:
+        raise HTTPException(
+            status_code=502,
+            detail="La previsión solar de Open-Meteo llegó incompleta para ese día. Inténtalo de nuevo en unos minutos."
+        )
+
+    # Techo físico de irradiancia (W/m²) para detectar valores corruptos del
+    # proveedor sin tumbar la petición — se recorta, no se descarta el resto del día.
+    PHYSICAL_MAX_IRRADIANCE = 1400.0
+
     # Rendimiento del sistema (pérdidas por temperatura, cableado, inversor)
     efficiency = 0.80
     production = []
-    for i in range(min(24, len(times))):
-        ghi = ghi_list[i] or 0 if i < len(ghi_list) else 0
-        dni = dni_list[i] or 0 if i < len(dni_list) else 0
-        dhi = dhi_list[i] or 0 if i < len(dhi_list) else 0
+    for i in range(24):
+        ghi = min(ghi_list[i] or 0, PHYSICAL_MAX_IRRADIANCE)
+        dni = min(dni_list[i] or 0, PHYSICAL_MAX_IRRADIANCE)
+        dhi = min(dhi_list[i] or 0, PHYSICAL_MAX_IRRADIANCE)
 
         # Los valores de Open-Meteo son medias de la hora anterior al timestamp;
         # usamos el punto medio del intervalo para calcular la posición solar.
