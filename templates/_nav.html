@@ -1,0 +1,27 @@
+<div id="topbar" style="position:sticky;top:0;z-index:50">
+  <div style="max-width:1180px;margin:0 auto;padding:0 26px">
+    <nav style="display:flex;align-items:center;gap:12px;padding:16px 0">
+      <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit">
+        <img src="/static/assets/logo.png" alt="CronoSolar" style="width:36px;height:36px;object-fit:contain;flex-shrink:0"/>
+        <div class="brand" style="font-size:20px;font-weight:800;letter-spacing:-.5px">CronoSolar</div>
+      </a>
+      <div class="nav-links">
+        <a href="/#como-funciona"{% if active=='como-funciona' %} class="active"{% endif %}>Cómo funciona</a>
+        <a href="/#servicio"{% if active=='servicio' %} class="active"{% endif %}>El servicio</a>
+        <a href="/#alertas"{% if active=='alertas' %} class="active"{% endif %}>Alertas</a>
+        <a href="/#impacto"{% if active=='impacto' %} class="active"{% endif %}>Impacto</a>
+        <a href="/tutoriales"{% if active=='tutoriales' %} class="active"{% endif %}>Tutoriales</a>
+        <a href="/optimizar" class="nav-cta{% if active=='optimizar' %} active{% endif %}">Calculadora</a>
+      </div>
+      <button class="nav-toggle" onclick="document.getElementById('nav-drawer').classList.toggle('open')" aria-label="Menú">☰</button>
+    </nav>
+    <div class="nav-drawer" id="nav-drawer">
+      <a href="/#como-funciona">Cómo funciona</a>
+      <a href="/#servicio">El servicio</a>
+      <a href="/#alertas">Alertas</a>
+      <a href="/#impacto">Impacto</a>
+      <a href="/tutoriales"{% if active=='tutoriales' %} class="active"{% endif %}>Tutoriales</a>
+      <a href="/optimizar"{% if active=='optimizar' %} class="active"{% endif %}>Calculadora</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,5 @@
+// Nav móvil: cierra el menú al elegir un enlace
+(function () {
+  const d = document.getElementById('nav-drawer');
+  if (d) d.querySelectorAll('a').forEach(a => a.addEventListener('click', () => d.classList.remove('open')));
+})();

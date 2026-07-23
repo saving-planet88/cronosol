@@ -10,10 +10,10 @@ from typing import Optional
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 load_dotenv()
@@ -23,6 +23,7 @@ ESIOS_TOKEN = os.getenv("ESIOS_TOKEN", "")
 ESIOS_INDICATOR = 600
 
 app = FastAPI(title="SolOptim API")
+templates = Jinja2Templates(directory="templates")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -357,15 +358,15 @@ async def api_solar(
 # ── Servir frontend ──────────────────────────────────────
 
 @app.get("/")
-async def serve_landing():
-    return FileResponse("static/landing.html")
+async def serve_landing(request: Request):
+    return templates.TemplateResponse("landing.html", {"request": request, "active": "landing"})
 
 @app.get("/optimizar")
-async def serve_optimizar():
-    return FileResponse("static/index.html")
+async def serve_optimizar(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "active": "optimizar"})
 
 @app.get("/tutoriales")
-async def serve_tutoriales():
-    return FileResponse("static/tutoriales.html")
+async def serve_tutoriales(request: Request):
+    return templates.TemplateResponse("tutoriales.html", {"request": request, "active": "tutoriales"})
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

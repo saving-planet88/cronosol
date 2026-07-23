@@ -8,35 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --lemon:#E9EFB0; --lemon-lite:#F3F6DA; --cream:#FBFCEF;
-  --ink:#24301A; --muted:#5C6B39; --bdr:#D9E0A2;
-  --lime:#8CC63F; --lime-d:#2FA46B; --green:#157A4E; --sun:#F2D111; --forest:#0E3D2C;
-  --ff:'Hanken Grotesk',system-ui,sans-serif; --display:'Bricolage Grotesque','Hanken Grotesk',sans-serif; --mono:'JetBrains Mono',monospace;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--ff);background:var(--lemon);color:var(--ink);min-height:100vh;line-height:1.5}
+{% include "_base_styles.html" %}
+#topbar{border-bottom:1px solid var(--bdr)}
 .wrap{max-width:760px;margin:0 auto;padding:0 20px 60px}
-a{color:inherit;text-decoration:none}
-
-/* Nav global (compartida entre / , /optimizar y /tutoriales) */
-#topbar{position:sticky;top:0;z-index:50;background:var(--lemon);border-bottom:1px solid var(--bdr)}
-.logo{width:32px;height:32px;object-fit:contain;flex-shrink:0}
-.brand{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-.5px;text-decoration:none;display:flex;align-items:center;gap:10px}
-.nav-links{margin-left:auto;display:flex;align-items:center;gap:26px;font-size:14.5px;font-weight:500;color:var(--muted)}
-.nav-links a:hover{color:var(--green)}
-.nav-links a.active{color:var(--green);font-weight:700}
-.nav-cta{background:var(--green);color:#fff!important;padding:11px 22px;border-radius:999px;font-weight:600}
-.nav-cta.active{background:var(--forest);color:#fff!important}
-.nav-toggle{display:none;margin-left:auto;background:none;border:none;font-size:22px;color:var(--ink);cursor:pointer;padding:6px;line-height:1}
-.nav-drawer{display:none;flex-direction:column;padding:4px 26px 16px}
-.nav-drawer.open{display:flex}
-.nav-drawer a{padding:13px 2px;font-size:15.5px;font-weight:600;color:var(--ink);border-bottom:1px solid var(--bdr)}
-.nav-drawer a.active{color:var(--green)}
-@media(max-width:760px){
-  .nav-links{display:none}
-  .nav-toggle{display:block}
-}
 
 .hdr{padding:24px 0 8px}
 .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);margin-bottom:12px;font-weight:600}
@@ -79,28 +53,7 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
 </head>
 <body>
 
-<div id="topbar">
-  <div style="max-width:1180px;margin:0 auto;padding:0 26px">
-    <nav style="display:flex;align-items:center;gap:12px;padding:16px 0">
-      <a class="brand" href="/"><img class="logo" src="/static/assets/logo.png" alt="CronoSolar">CronoSolar</a>
-      <div class="nav-links">
-        <a href="/#como-funciona">Cómo funciona</a>
-        <a href="/#alertas">Alertas</a>
-        <a href="/#impacto">Impacto</a>
-        <a href="/tutoriales" class="active">Tutoriales</a>
-        <a href="/optimizar" class="nav-cta">Calculadora</a>
-      </div>
-      <button class="nav-toggle" onclick="document.getElementById('nav-drawer').classList.toggle('open')" aria-label="Menú">☰</button>
-    </nav>
-    <div class="nav-drawer" id="nav-drawer">
-      <a href="/#como-funciona">Cómo funciona</a>
-      <a href="/#alertas">Alertas</a>
-      <a href="/#impacto">Impacto</a>
-      <a href="/tutoriales" class="active">Tutoriales</a>
-      <a href="/optimizar">Calculadora</a>
-    </div>
-  </div>
-</div>
+{% include "_nav.html" %}
 
 <div class="wrap">
 
@@ -218,11 +171,11 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
 </div>
 
 <script>
+{% include "_nav_script.html" %}
+
 function toggle(id) {
   document.getElementById(id).classList.toggle('open');
 }
-// Cierra el menú móvil al elegir un enlace (el drawer de navegación, no las tarjetas de marca)
-document.getElementById('nav-drawer').querySelectorAll('a').forEach(a => a.addEventListener('click', () => document.getElementById('nav-drawer').classList.remove('open')));
 // Si llegamos con un hash (#huawei, #fronius...), abre esa tarjeta y desplaza hasta ella
 const hash = location.hash.replace('#','');
 if (hash && document.getElementById(hash)) {
