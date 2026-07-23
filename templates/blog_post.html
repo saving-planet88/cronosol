@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ post.title }} — Blog CronoSolar</title>
 <meta name="description" content="{{ post.excerpt }}">
+{% set seo_title = post.title ~ " — Blog CronoSolar" %}
+{% set seo_description = post.excerpt %}
+{% set seo_path = "blog/" ~ post.slug %}
+{% set seo_image = "static/assets/blog/" ~ post.slug ~ ".webp" %}
+{% set seo_type = "article" %}
+{% include "_seo_meta.html" %}
+<meta property="article:published_time" content="{{ post.date }}">
+<meta property="article:section" content="{{ post.tag }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -24,7 +32,26 @@ p+p{margin-top:14px}
 .src{font-size:12.5px;color:var(--muted);margin-top:36px;padding-top:20px;border-top:1px solid var(--bdr)}
 .src a{color:var(--green);font-weight:600}
 .back{display:inline-block;margin-bottom:20px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.hero-img{width:100%;height:auto;border-radius:16px;margin-bottom:32px;display:block}
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ post.title|tojson }},
+  "description": {{ post.excerpt|tojson }},
+  "image": "{{ request.base_url }}static/assets/blog/{{ post.slug }}.webp",
+  "datePublished": "{{ post.date }}",
+  "dateModified": "{{ post.date }}",
+  "author": { "@type": "Organization", "name": "CronoSolar" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "CronoSolar",
+    "logo": { "@type": "ImageObject", "url": "{{ request.base_url }}static/assets/logo.webp" }
+  },
+  "mainEntityOfPage": "{{ request.base_url }}blog/{{ post.slug }}"
+}
+</script>
 </head>
 <body>
 
@@ -35,6 +62,7 @@ p+p{margin-top:14px}
   <div class="eyebrow">{{ post.tag }}</div>
   <h1>{{ post.title }}</h1>
   <div class="meta">{{ post.date }} · {{ post.read_time }} de lectura</div>
+  <img class="hero-img" src="/static/assets/blog/{{ post.slug }}.webp" alt="{{ post.title }}" width="1200" height="630">
   {% include "blog/" ~ post.slug ~ ".html" %}
 </div>
 

@@ -1,0 +1,29 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0E3D2C"/>
+  <circle cx="600" cy="315" r="180" fill="#157A4E"/>
+  <path d="M480 250 Q560 200 660 240 Q740 270 720 340 Q700 410 610 420 Q520 430 480 360 Q450 300 480 250Z" fill="#8CC63F" opacity="0.9"/>
+  <path d="M540 380 Q600 350 660 390 Q700 415 670 450 Q630 475 580 455 Q540 435 540 380Z" fill="#2FA46B" opacity="0.9"/>
+  <g fill="#E9EFB0" opacity="0.5">
+    <circle cx="550" cy="270" r="4"/>
+    <circle cx="600" cy="300" r="3"/>
+    <circle cx="650" cy="260" r="3"/>
+    <circle cx="620" cy="360" r="3"/>
+  </g>
+  <g stroke="#F2D111" stroke-width="3" fill="none" opacity="0.9">
+    <ellipse cx="600" cy="315" rx="260" ry="90"/>
+  </g>
+  <g fill="#F2D111">
+    <circle cx="860" cy="300" r="9"/>
+    <circle cx="340" cy="330" r="9"/>
+  </g>
+  <g font-family="'Bricolage Grotesque',Georgia,serif" fill="#EAF3D8">
+    <text x="150" y="130" font-size="26" font-weight="700">1,1°C</text>
+    <text x="150" y="160" font-size="14" opacity="0.7">desde la era preindustrial</text>
+    <text x="900" y="130" font-size="26" font-weight="700" text-anchor="end">IPCC</text>
+    <text x="900" y="160" font-size="14" opacity="0.7" text-anchor="end">AR6 · IEA · IRENA</text>
+    <text x="150" y="540" font-size="26" font-weight="700">81%</text>
+    <text x="150" y="570" font-size="14" opacity="0.7">renovable en 2030 (objetivo ES)</text>
+    <text x="900" y="540" font-size="26" font-weight="700" text-anchor="end">1/3</text>
+    <text x="900" y="570" font-size="14" opacity="0.7" text-anchor="end">emisiones globales: energía</text>
+  </g>
+</svg>

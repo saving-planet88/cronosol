@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CronoSolar — Optimiza tu autoconsumo solar</title>
+<meta name="description" content="Calculadora gratuita: introduce tu instalación solar y batería y obtén el plan horario óptimo del día, con el precio real del mercado eléctrico (ESIOS/REE) y tu previsión solar.">
+{% set seo_title = "CronoSolar — Optimiza tu autoconsumo solar" %}
+{% set seo_description = "Calculadora gratuita: introduce tu instalación solar y batería y obtén el plan horario óptimo del día, con el precio real del mercado eléctrico (ESIOS/REE) y tu previsión solar." %}
+{% set seo_path = "optimizar" %}
+{% include "_seo_meta.html" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,6 +83,8 @@ tr:hover td{background:var(--lemon-lite)}
 {% include "_nav.html" %}
 
 <div class="wrap">
+
+  <h1 style="font-size:15px;font-weight:700;color:var(--muted);margin-bottom:16px;letter-spacing:-.2px">Calculadora de autoconsumo solar: tu plan horario óptimo, hoy y mañana</h1>
 
   <div class="cols">
     <!-- LEFT: Location -->

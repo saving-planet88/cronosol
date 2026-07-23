@@ -13,6 +13,7 @@ import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -32,7 +33,7 @@ BLOG_POSTS = [
         "tag": "Red eléctrica",
         "title": "Por qué la hora de tu enchufe importa para el clima",
         "excerpt": "El precio del mercado eléctrico y la limpieza de la red se mueven casi siempre juntos. Así funciona la conexión, y por qué mover tu consumo aprovecha ambas cosas a la vez.",
-        "date": "2026-07-23",
+        "date": "2026-07-10",
         "read_time": "4 min",
     },
     {
@@ -40,8 +41,16 @@ BLOG_POSTS = [
         "tag": "Contexto",
         "title": "El cambio climático explicado en 5 datos (con fuentes)",
         "excerpt": "Cinco datos consolidados por la ciencia del clima —IPCC, IEA, IRENA— y por qué decisiones cotidianas como cuándo enciendes un electrodoméstico siguen teniendo sentido.",
-        "date": "2026-07-23",
+        "date": "2026-07-15",
         "read_time": "5 min",
+    },
+    {
+        "slug": "curva-de-demanda",
+        "tag": "Red eléctrica",
+        "title": "La curva del pato: por qué compensa cargar la batería a mediodía",
+        "excerpt": "La demanda eléctrica española y la generación solar no siguen la misma curva. Entender el desajuste explica por qué tener batería cambia tanto las cuentas.",
+        "date": "2026-07-19",
+        "read_time": "4 min",
     },
     {
         "slug": "cuanto-co2-evita-el-autoconsumo",
@@ -51,15 +60,8 @@ BLOG_POSTS = [
         "date": "2026-07-23",
         "read_time": "4 min",
     },
-    {
-        "slug": "curva-de-demanda",
-        "tag": "Red eléctrica",
-        "title": "La curva del pato: por qué compensa cargar la batería a mediodía",
-        "excerpt": "La demanda eléctrica española y la generación solar no siguen la misma curva. Entender el desajuste explica por qué tener batería cambia tanto las cuentas.",
-        "date": "2026-07-23",
-        "read_time": "4 min",
-    },
 ]
+BLOG_POSTS.sort(key=lambda p: p["date"], reverse=True)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -445,5 +447,36 @@ async def submit_installer_lead(lead: InstallerLead):
     with open(LEADS_FILE, "w") as f:
         json.dump(leads, f, ensure_ascii=False, indent=2)
     return {"ok": True}
+
+@app.get("/robots.txt")
+async def robots_txt(request: Request):
+    body = f"User-agent: *\nAllow: /\nSitemap: {request.base_url}sitemap.xml\n"
+    return Response(content=body, media_type="text/plain")
+
+
+@app.get("/sitemap.xml")
+async def sitemap_xml(request: Request):
+    base = str(request.base_url)
+    static_pages = [
+        ("", "1.0"),
+        ("optimizar", "0.9"),
+        ("tutoriales", "0.8"),
+        ("impacto", "0.7"),
+        ("blog", "0.7"),
+        ("instaladores", "0.5"),
+    ]
+    urls = [f"<url><loc>{base}{path}</loc><priority>{priority}</priority></url>" for path, priority in static_pages]
+    for post in BLOG_POSTS:
+        urls.append(
+            f"<url><loc>{base}blog/{post['slug']}</loc><lastmod>{post['date']}</lastmod><priority>0.6</priority></url>"
+        )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        + "".join(urls)
+        + "</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

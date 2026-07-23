@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CronoSolar — Vive al ritmo del sol, no del contador</title>
 <meta name="description" content="CronoSolar cruza el precio real del mercado eléctrico con la previsión de tu producción solar, y te dice hora a hora cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes. Gratis.">
+{% set seo_title = "CronoSolar — Vive al ritmo del sol, no del contador" %}
+{% set seo_description = "CronoSolar cruza el precio real del mercado eléctrico con la previsión de tu producción solar, y te dice hora a hora cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes. Gratis." %}
+{% set seo_path = "" %}
+{% include "_seo_meta.html" %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -23,6 +27,28 @@ a:hover{color:var(--green)}
 #topbar{transition:background .35s ease,box-shadow .35s ease,backdrop-filter .35s ease}
 #topbar.scrolled{background:rgba(233,239,176,.82);backdrop-filter:saturate(1.2) blur(10px);box-shadow:0 1px 0 rgba(37,48,26,.06)}
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "CronoSolar",
+  "url": "{{ request.base_url }}",
+  "logo": "{{ request.base_url }}static/assets/logo.webp",
+  "description": "Optimizador gratuito de autoconsumo solar y batería para hogares en España."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "CronoSolar",
+  "url": "{{ request.base_url }}optimizar",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "description": "Calcula hora a hora cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes según el precio real del mercado eléctrico y tu previsión solar."
+}
+</script>
 </head>
 <body>
 
