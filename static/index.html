@@ -6,34 +6,39 @@
 <title>CronoSolar — Optimiza tu autoconsumo solar</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
 :root {
-  --bg:#0B0F19; --s1:#111827; --s2:#1E293B; --bdr:#1E293B;
-  --tx:#E2E8F0; --dim:#64748B; --dim2:#475569;
-  --sol:#EAB308; --grn:#22C55E; --red:#EF4444; --blu:#3B82F6; --pur:#A855F7;
-  --r:12px; --ff:'DM Sans',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  --lemon:#E9EFB0; --lemon-lite:#F3F6DA; --cream:#FBFCEF;
+  --ink:#24301A; --muted:#5C6B39; --bdr:#D9E0A2;
+  --lime:#8CC63F; --lime-d:#2FA46B; --green:#157A4E; --sun:#F2D111;
+  --forest:#0E3D2C; --blue:#3E7CC8;
+  --amber:#B8860B; --brick:#B23A48; --violet:#6B4FA0; --teal:#0A8F82;
+  --ff:'Hanken Grotesk',system-ui,sans-serif; --display:'Bricolage Grotesque','Hanken Grotesk',sans-serif; --mono:'JetBrains Mono',monospace;
+  --r:14px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--ff);background:var(--bg);color:var(--tx);min-height:100vh}
-.wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
+body{font-family:var(--ff);background:var(--lemon);color:var(--ink);min-height:100vh;line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+a{color:inherit}
 
 /* Header */
-.hdr{display:flex;align-items:center;gap:10px;margin-bottom:24px}
-.logo{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#EAB308,#F59E0B);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 20px #EAB30840}
-.hdr h1{font-size:21px;font-weight:700;letter-spacing:-.5px}
-.hdr h1 b{color:var(--sol)}
-.badge{margin-left:auto;font-size:11px;color:var(--dim2);background:var(--s2);padding:4px 10px;border-radius:6px}
+.hdr{display:flex;align-items:center;gap:10px;margin-bottom:22px;padding:6px 0}
+.hdr a.brandlink{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+.logo{width:34px;height:34px;object-fit:contain;flex-shrink:0}
+.hdr h1{font-family:var(--display);font-size:21px;font-weight:800;letter-spacing:-.5px}
+.badge{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--cream);border:1px solid var(--bdr);padding:5px 12px;border-radius:999px}
 
 /* Cards */
-.card{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:20px}
-.sec-h{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:14px;font-weight:600}
+.card{background:var(--cream);border:1px solid var(--bdr);border-radius:var(--r);padding:20px}
+.sec-h{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:14px;font-weight:600}
 
 /* Inputs */
-label{display:block;font-size:11px;color:var(--dim);margin-bottom:3px;font-weight:500}
-input,select{width:100%;padding:9px 11px;background:var(--s2);border:1px solid #334155;border-radius:7px;color:var(--tx);font-family:var(--mono);font-size:13px;outline:none}
-input:focus{border-color:var(--sol)}
-.unit{font-size:10px;color:var(--dim2);margin-top:2px}
+label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px;font-weight:600}
+input,select{width:100%;padding:10px 11px;background:#fff;border:1px solid var(--bdr);border-radius:10px;color:var(--ink);font-family:var(--mono);font-size:13px;outline:none}
+input:focus{border-color:var(--green)}
+.unit{font-size:10px;color:var(--muted);margin-top:2px}
 
 /* Layout */
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
@@ -41,42 +46,41 @@ input:focus{border-color:var(--sol)}
 .g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
 
 /* Buttons */
-.btn{padding:12px 32px;background:linear-gradient(135deg,#EAB308,#CA8A04);color:var(--bg);border:none;border-radius:8px;font-family:var(--ff);font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px #EAB30830}
-.btn:hover{filter:brightness(1.1)}
+.btn{padding:13px 32px;background:var(--green);color:#fff;border:none;border-radius:999px;font-family:var(--ff);font-size:15px;font-weight:700;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-.btn-s{padding:6px 12px;background:transparent;border:1px solid #334155;border-radius:6px;color:#94A3B8;font-size:11px;cursor:pointer;font-family:var(--ff);font-weight:500}
-.btn-s:hover{border-color:var(--sol);color:var(--sol)}
-.btn-find{padding:9px 14px;background:var(--sol);border:none;border-radius:7px;color:var(--bg);font-size:12px;cursor:pointer;font-weight:700;white-space:nowrap}
+.btn-s{padding:7px 13px;background:#fff;border:1px solid var(--bdr);border-radius:999px;color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--ff);font-weight:600}
+.btn-s:hover{border-color:var(--green);color:var(--green)}
+.btn-find{padding:10px 15px;background:var(--green);border:none;border-radius:10px;color:#fff;font-size:12px;cursor:pointer;font-weight:700;white-space:nowrap}
 
 /* KPI */
-.kpi .label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);margin-bottom:8px;font-weight:600}
+.kpi .label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;font-weight:600}
 .kpi .val{font-family:var(--mono);font-size:24px;font-weight:700;line-height:1}
-.kpi .det{font-size:11px;color:var(--dim2);margin-top:5px}
+.kpi .det{font-size:11px;color:var(--muted);margin-top:5px}
 
 /* Tags */
-.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700}
 
 /* Table */
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:left;padding:7px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);border-bottom:1px solid var(--bdr);white-space:nowrap}
-td{padding:5px 8px;border-bottom:1px solid #1E293B15;font-family:var(--mono);font-size:11px;white-space:nowrap}
-tr:hover td{background:#1E293B30}
+th{text-align:left;padding:7px 8px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:1px solid var(--bdr);white-space:nowrap}
+td{padding:6px 8px;border-bottom:1px solid var(--bdr);font-family:var(--mono);font-size:11px;white-space:nowrap}
+tr:hover td{background:var(--lemon-lite)}
 
 /* Alert cards */
-.alert-row{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--bdr);margin-bottom:8px}
-.alert-time{font-family:var(--mono);font-size:13px;color:var(--sol);font-weight:700;min-width:48px;padding-top:2px}
-.alert-msg{font-size:12px;color:#94A3B8;line-height:1.4;margin-top:4px}
+.alert-row{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:#fff;border-radius:10px;border:1px solid var(--bdr);margin-bottom:8px}
+.alert-time{font-family:var(--mono);font-size:13px;color:var(--green);font-weight:700;min-width:48px;padding-top:2px}
+.alert-msg{font-size:12px;color:var(--muted);line-height:1.4;margin-top:4px}
 
 /* Map */
-.map-box{border-radius:10px;overflow:hidden;border:1px solid var(--bdr);height:320px;background:var(--s2);position:relative}
-.map-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:#000c;color:#ccc;font-size:10px;padding:3px 10px;border-radius:4px;z-index:999;pointer-events:none}
-.leaflet-container{background:var(--s2)!important}
+.map-box{border-radius:12px;overflow:hidden;border:1px solid var(--bdr);height:320px;background:var(--lemon-lite);position:relative}
+.map-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(36,48,26,.82);color:#fff;font-size:10px;padding:3px 10px;border-radius:999px;z-index:999;pointer-events:none}
 
 /* Sources */
-.src{font-size:10px;padding:3px 10px;border-radius:5px;font-weight:500;display:inline-block;margin-right:8px;margin-bottom:8px}
+.src{font-size:10px;padding:4px 12px;border-radius:999px;font-weight:600;display:inline-block;margin-right:8px;margin-bottom:8px}
 
 /* Status */
-.status{text-align:center;padding:40px 20px;color:var(--dim2);font-size:13px}
+.status{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
 
 @media(max-width:700px){
   .cols{grid-template-columns:1fr}
@@ -89,9 +93,9 @@ tr:hover td{background:#1E293B30}
 <div class="wrap">
 
   <div class="hdr">
-    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit">
-      <div class="logo">☀</div>
-      <h1>Crono<b>Solar</b></h1>
+    <a class="brandlink" href="/">
+      <img class="logo" src="/static/assets/logo.png" alt="CronoSolar">
+      <h1>CronoSolar</h1>
     </a>
     <div class="badge">MVP Fase 1.5</div>
   </div>
@@ -115,7 +119,7 @@ tr:hover td{background:#1E293B30}
         <div><label>Longitud</label><input type="number" id="lon" value="2.29" step="0.001"></div>
       </div>
 
-      <div id="loc-name" style="font-size:13px;color:var(--sol);font-weight:600">Granollers</div>
+      <div id="loc-name" style="font-family:var(--display);font-size:15px;color:var(--green);font-weight:700">Granollers</div>
 
       <div class="map-box">
         <div id="map" style="width:100%;height:100%"></div>
@@ -149,7 +153,7 @@ tr:hover td{background:#1E293B30}
   </div>
 
   <div id="results" style="display:none"></div>
-  <div class="status" id="status-msg">Indica tu ubicacion, configura tu instalacion y pulsa <strong style="color:#94A3B8">Optimizar dia</strong>.</div>
+  <div class="status" id="status-msg">Indica tu ubicacion, configura tu instalacion y pulsa <strong style="color:var(--ink)">Optimizar dia</strong>.</div>
 
 </div>
 
@@ -158,7 +162,7 @@ tr:hover td{background:#1E293B30}
 const tom = new Date(Date.now()+864e5).toISOString().split('T')[0];
 document.getElementById('fecha').value = tom;
 
-// ── Prefill desde la URL (enlace de informe compartido por el bot de Telegram) ──
+// ── Prefill desde la URL (enlace de informe compartido por el bot de Telegram / landing) ──
 const qp = new URLSearchParams(location.search);
 const fromLink = qp.has('lat') && qp.has('lon');
 if (fromLink) {
@@ -204,7 +208,7 @@ async function geocode() {
   const q = document.getElementById('cp').value.trim();
   if (!q) return;
   const st = document.getElementById('geo-status');
-  st.style.color = 'var(--dim)';
+  st.style.color = 'var(--muted)';
   st.textContent = 'Buscando...';
   try {
     const isCP = /^\d{4,5}$/.test(q);
@@ -217,14 +221,14 @@ async function geocode() {
       const lat=parseFloat(d[0].lat), lon=parseFloat(d[0].lon);
       const name = d[0].display_name.split(',').slice(0,2).join(', ');
       setLocation(lat,lon,name,14);
-      st.style.color = 'var(--grn)';
+      st.style.color = 'var(--green)';
       st.textContent = 'Ubicacion encontrada';
     } else {
-      st.style.color = '#F59E0B';
+      st.style.color = '#B45309';
       st.textContent = 'No encontrado. Haz click en el mapa para pinear.';
     }
   } catch(e) {
-    st.style.color = '#F59E0B';
+    st.style.color = '#B45309';
     st.textContent = 'Sin conexion. Haz click en el mapa para pinear.';
   }
 }
@@ -300,7 +304,7 @@ async function run() {
   const gridCost = api.total_grid_cost_eur;
   const pct=totalNoOpt>0?((totalSav/totalNoOpt)*100).toFixed(0):0;
 
-  const ACT={solar:{l:'Autoconsumo',bg:'#EAB30825',c:'#EAB308'},charge:{l:'Carga bateria',bg:'#3B82F625',c:'#3B82F6'},discharge:{l:'Descarga bateria',bg:'#A855F7',c:'#fff'},export:{l:'Vertido a red',bg:'#22C55E25',c:'#22C55E'},grid:{l:'Compra de red',bg:'#EF444425',c:'#EF4444'}};
+  const ACT={solar:{l:'Autoconsumo',bg:'#B8860B22',c:'#8A650A'},charge:{l:'Carga bateria',bg:'#157A4E22',c:'#157A4E'},discharge:{l:'Descarga bateria',bg:'#6B4FA0',c:'#fff'},export:{l:'Vertido a red',bg:'#0A8F8222',c:'#0A8F82'},grid:{l:'Compra de red',bg:'#B23A4822',c:'#B23A48'}};
   const AMSG={solar:'Tu produccion solar cubre el consumo. No necesitas hacer nada.',charge:'Excedente solar disponible. Activa la carga de bateria en tu inversor.',discharge:'Precio alto ({p} €/MWh). Descarga bateria para evitar comprar de red.',export:'Bateria llena y excedente solar. Vertiendo a red (~0.06 €/kWh).',grid:'Sin produccion solar. Consumiendo de red a {p} €/MWh.'};
   const AEMOJI={solar:'☀️',charge:'🔋⬆️',discharge:'🔋⬇️',export:'📤',grid:'🔌'};
 
@@ -318,19 +322,20 @@ async function run() {
   const cP=hours.map((d,i)=>[xf(i),yK(d.consumption)]);
   const pP=hours.map((d,i)=>[xf(i),yP(d.priceMwh)]);
   const bP=hours.map((d,i)=>[xf(i),yS(d.soc)]);
-  const ac={solar:'#EAB308',charge:'#3B82F6',discharge:'#A855F7',export:'#22C55E',grid:'#EF4444'};
+  const ac={solar:'#B8860B',charge:'#157A4E',discharge:'#6B4FA0',export:'#0A8F82',grid:'#B23A48'};
+  const C_SOLAR='#B8860B', C_CONS='#B23A48', C_PRICE='#3E7CC8', C_BAT='#157A4E';
 
   let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">`;
-  for(let i=0;i<=4;i++){const yy=P+(i/4)*(H-P*2);svg+=`<line x1="${P}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="#1E293B" stroke-width=".8"/><text x="${P-6}" y="${yy+4}" fill="#64748B" font-size="9" text-anchor="end" font-family="monospace">${(mK*(1-i/4)).toFixed(1)}</text><text x="${W-PR+6}" y="${yy+4}" fill="#3B82F680" font-size="9" text-anchor="start" font-family="monospace">${(mP*(1-i/4)).toFixed(0)}</text>`;}
-  for(let i=0;i<24;i+=3)svg+=`<text x="${xf(i)}" y="${H-6}" fill="#64748B" font-size="9" text-anchor="middle" font-family="monospace">${String(i).padStart(2,'0')}h</text>`;
-  svg+=`<text x="${P-6}" y="${P-12}" fill="#64748B" font-size="8" text-anchor="end">kW</text>`;
-  svg+=`<text x="${W-PR+6}" y="${P-12}" fill="#3B82F680" font-size="8" text-anchor="start">€/MWh</text>`;
-  svg+=`<path d="${ln(sP)}L${xf(23)},${yK(0)}L${xf(0)},${yK(0)}Z" fill="#EAB30810"/>`;
-  svg+=`<path d="${ln(pP)}" fill="none" stroke="#3B82F650" stroke-width="1.5" stroke-dasharray="4,3"/>`;
-  svg+=`<path d="${ln(sP)}" fill="none" stroke="#EAB308" stroke-width="2.5"/>`;
-  svg+=`<path d="${ln(cP)}" fill="none" stroke="#EF4444" stroke-width="2"/>`;
-  if(bat>0)svg+=`<path d="${ln(bP)}" fill="none" stroke="#A855F7" stroke-width="1.5" stroke-dasharray="6,3"/>`;
-  hours.forEach((d,i)=>svg+=`<circle cx="${xf(i)}" cy="${yK(d.solar)}" r="3" fill="${ac[d.action]||'#666'}" opacity=".8"/>`);
+  for(let i=0;i<=4;i++){const yy=P+(i/4)*(H-P*2);svg+=`<line x1="${P}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--bdr)" stroke-width=".8"/><text x="${P-6}" y="${yy+4}" fill="#8A9A5F" font-size="9" text-anchor="end" font-family="monospace">${(mK*(1-i/4)).toFixed(1)}</text><text x="${W-PR+6}" y="${yy+4}" fill="${C_PRICE}99" font-size="9" text-anchor="start" font-family="monospace">${(mP*(1-i/4)).toFixed(0)}</text>`;}
+  for(let i=0;i<24;i+=3)svg+=`<text x="${xf(i)}" y="${H-6}" fill="#8A9A5F" font-size="9" text-anchor="middle" font-family="monospace">${String(i).padStart(2,'0')}h</text>`;
+  svg+=`<text x="${P-6}" y="${P-12}" fill="#8A9A5F" font-size="8" text-anchor="end">kW</text>`;
+  svg+=`<text x="${W-PR+6}" y="${P-12}" fill="${C_PRICE}99" font-size="8" text-anchor="start">€/MWh</text>`;
+  svg+=`<path d="${ln(sP)}L${xf(23)},${yK(0)}L${xf(0)},${yK(0)}Z" fill="${C_SOLAR}14"/>`;
+  svg+=`<path d="${ln(pP)}" fill="none" stroke="${C_PRICE}80" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  svg+=`<path d="${ln(sP)}" fill="none" stroke="${C_SOLAR}" stroke-width="2.5"/>`;
+  svg+=`<path d="${ln(cP)}" fill="none" stroke="${C_CONS}" stroke-width="2"/>`;
+  if(bat>0)svg+=`<path d="${ln(bP)}" fill="none" stroke="${C_BAT}" stroke-width="1.5" stroke-dasharray="6,3"/>`;
+  hours.forEach((d,i)=>svg+=`<circle cx="${xf(i)}" cy="${yK(d.solar)}" r="3" fill="${ac[d.action]||'#8A9A5F'}" opacity=".9"/>`);
   svg+=`</svg>`;
 
   // ── Alerts ──
@@ -343,42 +348,42 @@ async function run() {
 
   // ── Table ──
   let tbl=`<table><thead><tr><th>Hora</th><th>Precio</th><th>Solar</th><th>Consumo</th><th>Accion</th><th>Bateria</th><th>Ahorro</th></tr></thead><tbody>`;
-  hours.forEach(h=>{const a=ACT[h.action];tbl+=`<tr><td>${String(h.hour).padStart(2,'0')}:00</td><td>${h.priceMwh.toFixed(1)}</td><td style="color:var(--sol)">${h.solar.toFixed(2)}</td><td>${h.consumption.toFixed(2)}</td><td><span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span></td><td style="color:var(--pur)">${h.soc.toFixed(1)}</td><td style="color:${h.savings>0?'var(--grn)':'var(--dim2)'}">${h.savings.toFixed(3)} €</td></tr>`;});
+  hours.forEach(h=>{const a=ACT[h.action];tbl+=`<tr><td>${String(h.hour).padStart(2,'0')}:00</td><td>${h.priceMwh.toFixed(1)}</td><td style="color:${C_SOLAR}">${h.solar.toFixed(2)}</td><td>${h.consumption.toFixed(2)}</td><td><span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span></td><td style="color:${C_BAT}">${h.soc.toFixed(1)}</td><td style="color:${h.savings>0?'var(--green)':'var(--muted)'}">${h.savings.toFixed(3)} €</td></tr>`;});
   tbl+=`</tbody></table>`;
 
   // ── Render all ──
   res.innerHTML=`
     <div style="margin-bottom:16px">
-      <span class="src" style="color:var(--grn);background:#22C55E12">☀️ Solar: Open-Meteo (datos reales)</span>
-      <span class="src" style="color:var(--grn);background:#22C55E12">💶 Precios: ESIOS/REE (datos reales)</span>
+      <span class="src" style="color:var(--green);background:#157A4E1a">☀️ Solar: Open-Meteo (datos reales)</span>
+      <span class="src" style="color:var(--green);background:#157A4E1a">💶 Precios: ESIOS/REE (datos reales)</span>
     </div>
 
     <div class="g4">
-      <div class="card kpi"><div class="label">Ahorro estimado</div><div class="val" style="color:var(--grn)">${totalSav.toFixed(2)} €</div><div class="det">${pct}% menos vs. sin solar</div></div>
-      <div class="card kpi"><div class="label">Autoconsumo solar</div><div class="val" style="color:var(--sol)">${totalSelf.toFixed(1)} kWh</div><div class="det">Directamente del sol</div></div>
-      <div class="card kpi"><div class="label">Coste red</div><div class="val" style="color:var(--red)">${gridCost.toFixed(2)} €</div><div class="det">vs. ${totalNoOpt.toFixed(2)} € sin solar</div></div>
-      <div class="card kpi"><div class="label">Excedente vertido</div><div class="val" style="color:var(--blu)">${totalExp.toFixed(1)} kWh</div><div class="det">~${(totalExp*.06).toFixed(2)} € compensacion</div></div>
+      <div class="card kpi"><div class="label">Ahorro estimado</div><div class="val" style="color:var(--green)">${totalSav.toFixed(2)} €</div><div class="det">${pct}% menos vs. sin solar</div></div>
+      <div class="card kpi"><div class="label">Autoconsumo solar</div><div class="val" style="color:${C_SOLAR}">${totalSelf.toFixed(1)} kWh</div><div class="det">Directamente del sol</div></div>
+      <div class="card kpi"><div class="label">Coste red</div><div class="val" style="color:${C_CONS}">${gridCost.toFixed(2)} €</div><div class="det">vs. ${totalNoOpt.toFixed(2)} € sin solar</div></div>
+      <div class="card kpi"><div class="label">Excedente vertido</div><div class="val" style="color:${C_PRICE}">${totalExp.toFixed(1)} kWh</div><div class="det">~${(totalExp*.06).toFixed(2)} € compensacion</div></div>
     </div>
 
     <div class="card" style="margin-bottom:20px">
       <div class="sec-h">Curvas — ${locName} — ${dateStr}</div>
       ${svg}
       <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:12px">
-        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim)"><div style="width:9px;height:9px;border-radius:50%;background:var(--sol)"></div>Produccion solar</div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim)"><div style="width:9px;height:9px;border-radius:50%;background:var(--red)"></div>Consumo</div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim)"><div style="width:9px;height:9px;border-radius:50%;background:var(--blu)"></div>Precio pool</div>
-        ${bat>0?'<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim)"><div style="width:9px;height:9px;border-radius:50%;background:var(--pur)"></div>Bateria SOC</div>':''}
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:9px;height:9px;border-radius:50%;background:${C_SOLAR}"></div>Produccion solar</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:9px;height:9px;border-radius:50%;background:${C_CONS}"></div>Consumo</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:9px;height:9px;border-radius:50%;background:${C_PRICE}"></div>Precio pool</div>
+        ${bat>0?`<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:9px;height:9px;border-radius:50%;background:${C_BAT}"></div>Bateria SOC</div>`:''}
       </div>
     </div>
 
-    <div class="card" style="margin-bottom:20px;border-color:#EAB30830">
-      <div class="sec-h"><span style="color:var(--sol)">Fase 1.5</span> — Alertas Telegram que recibirias</div>
+    <div class="card" style="margin-bottom:20px;border-color:#B8860B55">
+      <div class="sec-h"><span style="color:${C_SOLAR}">Fase 1.5</span> — Alertas Telegram que recibirias</div>
       ${alertsHtml}
-      <div style="margin-top:14px;padding:10px 14px;background:var(--s2);border-radius:8px;font-size:12px;color:var(--dim);line-height:1.5">
-        Por Telegram recibes <strong style="color:#94A3B8">un solo mensaje por la mañana</strong> con el plan del día (no una alerta por cada cambio de hora) — programas tu inversor una vez y te olvidas. Pruébalo: <a href="https://t.me/Cronosolar_bot" target="_blank" style="color:var(--sol)">@Cronosolar_bot</a>.
+      <div style="margin-top:14px;padding:10px 14px;background:var(--lemon-lite);border-radius:10px;font-size:12px;color:var(--muted);line-height:1.5">
+        Por Telegram recibes <strong style="color:var(--ink)">un solo mensaje por la mañana</strong> con el plan del día (no una alerta por cada cambio de hora) — programas tu inversor una vez y te olvidas. Pruébalo: <a href="https://t.me/Cronosolar_bot" target="_blank" style="color:var(--green);font-weight:600">@Cronosolar_bot</a>.
       </div>
-      <div style="margin-top:8px;padding:10px 14px;background:var(--s2);border-radius:8px;font-size:12px;color:var(--dim);line-height:1.5">
-        🔧 ¿No sabes cómo programar las franjas horarias en tu inversor? <a href="/tutoriales" style="color:var(--sol)">Guías paso a paso por marca →</a>
+      <div style="margin-top:8px;padding:10px 14px;background:var(--lemon-lite);border-radius:10px;font-size:12px;color:var(--muted);line-height:1.5">
+        🔧 ¿No sabes cómo programar las franjas horarias en tu inversor? <a href="/tutoriales" style="color:var(--green);font-weight:600">Guías paso a paso por marca →</a>
       </div>
     </div>
 
