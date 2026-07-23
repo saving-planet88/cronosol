@@ -21,14 +21,26 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--ff);background:var(--lemon);color:var(--ink);min-height:100vh;line-height:1.5}
 .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
-a{color:inherit}
+a{color:inherit;text-decoration:none}
 
-/* Header */
-.hdr{display:flex;align-items:center;gap:10px;margin-bottom:22px;padding:6px 0}
-.hdr a.brandlink{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+/* Nav global (compartida entre / , /optimizar y /tutoriales) */
+h1,.brand{font-family:var(--display);letter-spacing:-.02em}
+#topbar{position:sticky;top:0;z-index:50;background:var(--lemon);border-bottom:1px solid var(--bdr)}
+.nav-links{margin-left:auto;display:flex;align-items:center;gap:26px;font-size:14.5px;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--green)}
+.nav-links a.active{color:var(--green);font-weight:700}
+.nav-cta{background:var(--green);color:#fff!important;padding:11px 22px;border-radius:999px;font-weight:600}
+.nav-cta.active{background:var(--forest);color:#fff!important}
+.nav-toggle{display:none;margin-left:auto;background:none;border:none;font-size:22px;color:var(--ink);cursor:pointer;padding:6px;line-height:1}
+.nav-drawer{display:none;flex-direction:column;padding:4px 26px 16px}
+.nav-drawer.open{display:flex}
+.nav-drawer a{padding:13px 2px;font-size:15.5px;font-weight:600;color:var(--ink);border-bottom:1px solid var(--bdr)}
+.nav-drawer a.active{color:var(--green)}
+@media(max-width:760px){
+  .nav-links{display:none}
+  .nav-toggle{display:block}
+}
 .logo{width:34px;height:34px;object-fit:contain;flex-shrink:0}
-.hdr h1{font-family:var(--display);font-size:21px;font-weight:800;letter-spacing:-.5px}
-.badge{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--cream);border:1px solid var(--bdr);padding:5px 12px;border-radius:999px}
 
 /* Cards */
 .card{background:var(--cream);border:1px solid var(--bdr);border-radius:var(--r);padding:20px}
@@ -90,15 +102,34 @@ tr:hover td{background:var(--lemon-lite)}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="hdr">
-    <a class="brandlink" href="/">
-      <img class="logo" src="/static/assets/logo.png" alt="CronoSolar">
-      <h1>CronoSolar</h1>
-    </a>
-    <div class="badge">MVP Fase 1.5</div>
+<div id="topbar">
+  <div style="max-width:1180px;margin:0 auto;padding:0 26px">
+    <nav style="display:flex;align-items:center;gap:12px;padding:16px 0">
+      <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit">
+        <img class="logo" src="/static/assets/logo.png" alt="CronoSolar" style="width:36px;height:36px">
+        <div class="brand" style="font-size:20px;font-weight:800;letter-spacing:-.5px">CronoSolar</div>
+      </a>
+      <div class="nav-links">
+        <a href="/#como-funciona">Cómo funciona</a>
+        <a href="/#alertas">Alertas</a>
+        <a href="/#impacto">Impacto</a>
+        <a href="/tutoriales">Tutoriales</a>
+        <a href="/optimizar" class="nav-cta active">Calculadora</a>
+      </div>
+      <button class="nav-toggle" onclick="document.getElementById('nav-drawer').classList.toggle('open')" aria-label="Menú">☰</button>
+    </nav>
+    <div class="nav-drawer" id="nav-drawer">
+      <a href="/#como-funciona">Cómo funciona</a>
+      <a href="/#alertas">Alertas</a>
+      <a href="/#impacto">Impacto</a>
+      <a href="/tutoriales">Tutoriales</a>
+      <a href="/optimizar" class="active">Calculadora</a>
+    </div>
   </div>
+</div>
+
+<div class="wrap">
 
   <div class="cols">
     <!-- LEFT: Location -->
@@ -158,6 +189,12 @@ tr:hover td{background:var(--lemon-lite)}
 </div>
 
 <script>
+// ── Nav móvil: cierra el menú al elegir un enlace ──
+(() => {
+  const drawer = document.getElementById('nav-drawer');
+  if (drawer) drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => drawer.classList.remove('open')));
+})();
+
 // ── Init ──
 const tom = new Date(Date.now()+864e5).toISOString().split('T')[0];
 document.getElementById('fecha').value = tom;
