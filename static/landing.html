@@ -3,250 +3,331 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CronoSol — Sincroniza tu consumo con el sol</title>
-<meta name="description" content="CronoSol te dice cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes, cruzando el precio real del mercado eléctrico con tu producción solar. Gratis.">
+<title>CronoSolar — Vive al ritmo del sol, no del contador</title>
+<meta name="description" content="CronoSolar cruza el precio real del mercado eléctrico con la previsión de tu producción solar, y te dice hora a hora cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes. Gratis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
-:root {
-  --bg:#0B0F19; --s1:#111827; --s2:#1E293B; --bdr:#1E293B;
-  --tx:#E2E8F0; --dim:#64748B; --dim2:#475569;
-  --sol:#EAB308; --grn:#22C55E; --red:#EF4444; --blu:#3B82F6; --pur:#A855F7;
-  --r:14px; --ff:'DM Sans',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+:root{
+  --lemon:#E9EFB0; --lemon-lite:#F3F6DA; --cream:#FBFCEF;
+  --ink:#24301A; --muted:#5C6B39; --bdr:#D9E0A2;
+  --lime:#8CC63F; --lime-d:#2FA46B; --green:#157A4E; --sun:#F2D111;
+  --forest:#0E3D2C; --forest2:#0A2E22; --blue:#3E7CC8;
+  --ff:'Hanken Grotesk',system-ui,sans-serif; --display:'Bricolage Grotesque','Hanken Grotesk',sans-serif; --mono:'JetBrains Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:var(--ff);background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.5}
-.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
-a{color:inherit}
-
-/* Nav */
-.nav{display:flex;align-items:center;gap:10px;padding:20px 0}
-.logo{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#EAB308,#F59E0B);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px #EAB30840;flex-shrink:0}
-.brand{font-size:19px;font-weight:800;letter-spacing:-.5px}
-.brand b{color:var(--sol)}
-.nav-links{margin-left:auto;display:flex;gap:28px;font-size:14px;color:var(--dim)}
-.nav-links a:hover{color:var(--tx)}
-@media(max-width:640px){.nav-links{display:none}}
-
-/* Hero */
-.hero{padding:60px 0 40px;text-align:center}
-.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--sol);margin-bottom:18px}
-.hero h1{font-size:clamp(32px,6vw,58px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;max-width:820px;margin:0 auto 20px}
-.hero h1 em{font-style:normal;background:linear-gradient(135deg,#EAB308,#F59E0B);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{font-size:17px;color:#94A3B8;max-width:560px;margin:0 auto 36px}
-
-/* Mini calc */
-.calc{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;padding:26px;max-width:640px;margin:0 auto 18px;text-align:left}
-.calc-h{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:14px;font-weight:700}
-.calc-row{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:10px;margin-bottom:14px}
-.calc-row label{display:block;font-size:11px;color:var(--dim);margin-bottom:4px;font-weight:500}
-.calc-row input{width:100%;padding:11px 12px;background:var(--s2);border:1px solid #334155;border-radius:9px;color:var(--tx);font-family:var(--mono);font-size:14px;outline:none}
-.calc-row input:focus{border-color:var(--sol)}
-.calc-status{font-size:11px;min-height:14px;margin:-6px 0 12px;color:var(--dim)}
-.calc-btn{width:100%;padding:14px;background:linear-gradient(135deg,#EAB308,#CA8A04);color:#0B0F19;border:none;border-radius:10px;font-family:var(--ff);font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px #EAB30830}
-.calc-btn:hover{filter:brightness(1.08)}
-.calc-btn:disabled{opacity:.5;cursor:not-allowed}
-.calc-result{display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--bdr)}
-.calc-result.show{display:block}
-.stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
-.stat{background:var(--bg);border:1px solid var(--bdr);border-radius:14px;padding:16px;text-align:center}
-.stat .n{font-family:var(--mono);font-size:26px;font-weight:700;line-height:1}
-.stat .l{font-size:11px;color:var(--dim);margin-top:6px;text-transform:uppercase;letter-spacing:.4px}
-.calc-cta{display:block;text-align:center;padding:12px;background:var(--s2);border:1px solid #334155;border-radius:10px;font-size:13px;font-weight:600;color:var(--tx);text-decoration:none}
-.calc-cta:hover{border-color:var(--sol);color:var(--sol)}
-.hero-note{font-size:12px;color:var(--dim2)}
-
-/* Sections */
-section{padding:64px 0}
-.sec-kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--sol);text-align:center;margin-bottom:10px}
-.sec-h{font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:-.8px;text-align:center;margin-bottom:44px}
-
-/* 3 steps */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-@media(max-width:800px){.steps{grid-template-columns:1fr}}
-.step{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:24px}
-.step-n{font-family:var(--mono);font-size:13px;color:var(--sol);font-weight:700;margin-bottom:12px}
-.step h3{font-size:17px;font-weight:700;margin-bottom:8px}
-.step p{font-size:13.5px;color:#94A3B8}
-
-/* Impact split */
-.impact{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
-@media(max-width:800px){.impact{grid-template-columns:1fr}}
-.impact-card{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:28px}
-.impact-card .n{font-family:var(--mono);font-size:38px;font-weight:800;line-height:1}
-.impact-card .l{font-size:13px;color:var(--dim);margin-top:8px}
-.impact-card.money .n{color:var(--grn)}
-.impact-card.co2 .n{color:#7FD9C9}
-.impact-note{grid-column:1/-1;font-size:12.5px;color:var(--dim2);text-align:center;margin-top:4px}
-.impact-equiv{grid-column:1/-1;display:flex;gap:22px;justify-content:center;flex-wrap:wrap;font-size:13.5px;color:#CBD5E1;margin-top:-4px}
-.impact-equiv .eq{display:flex;align-items:center;gap:6px}
-.impact-method{grid-column:1/-1;font-size:13px;color:#94A3B8;background:var(--s1);border:1px solid var(--bdr);border-radius:12px;padding:16px 18px;line-height:1.6}
-
-/* Alerts demo */
-.alerts-demo{display:grid;grid-template-columns:.9fr 1.1fr;gap:36px;align-items:center}
-@media(max-width:800px){.alerts-demo{grid-template-columns:1fr}}
-.phone-mock{background:#17212b;border:1px solid var(--bdr);border-radius:20px;padding:16px;max-width:340px;margin:0 auto;box-shadow:0 20px 50px -20px #000a}
-.tg-bubble{background:#1e2c3a;border-radius:14px;padding:14px 16px;font-size:12.5px}
-.tg-line{margin-bottom:6px;color:#dfe6ec}
-.tg-line.b{font-weight:700;color:#fff}
-.tg-line.dim{color:#8a97a3;font-size:11.5px}
-.tg-line.grn{color:#7cd992}
-.tg-line.co2{color:#7FD9C9;font-size:11.5px}
-.tg-line.mono{font-family:var(--mono);font-size:11px;color:#c9d3db}
-.tg-line.link{color:#6ab7f5;font-size:11.5px}
-.tg-gap{height:6px}
-.alerts-text p{font-size:14.5px;color:#94A3B8;margin-bottom:14px}
-.alerts-text strong{color:var(--tx)}
-
-/* CTA band */
-.ctaband{background:linear-gradient(135deg,#1a2332,#111827);border:1px solid var(--bdr);border-radius:24px;padding:48px 32px;text-align:center}
-.ctaband h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin-bottom:10px}
-.ctaband p{color:#94A3B8;font-size:14.5px;margin-bottom:26px}
-.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.btn-primary{padding:14px 30px;background:linear-gradient(135deg,#EAB308,#CA8A04);color:#0B0F19;border:none;border-radius:10px;font-family:var(--ff);font-size:15px;font-weight:800;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px #EAB30830}
-.btn-secondary{padding:14px 30px;background:transparent;border:1px solid #334155;border-radius:10px;color:var(--tx);font-size:15px;font-weight:700;text-decoration:none}
-.btn-secondary:hover{border-color:var(--sol);color:var(--sol)}
-
-footer{padding:32px 0 40px;text-align:center;font-size:12px;color:var(--dim2)}
+body{font-family:var(--ff);background:var(--lemon);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+a:hover{color:var(--green)}
+h1,h2,h3,.brand{font-family:var(--display);letter-spacing:-.02em}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(2deg)}}
+.fadeup{opacity:0;animation:fadeUp .9s cubic-bezier(.2,.7,.2,1) forwards}
+.stagger>*{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.stagger.in>*{opacity:1;transform:none}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.floaty{animation:floaty 6s ease-in-out infinite}
+.lift{transition:transform .3s ease,border-color .3s ease}
+.lift:hover{transform:translateY(-6px);border-color:var(--lime)}
+#topbar{transition:background .35s ease,box-shadow .35s ease,backdrop-filter .35s ease}
+#topbar.scrolled{background:rgba(233,239,176,.82);backdrop-filter:saturate(1.2) blur(10px);box-shadow:0 1px 0 rgba(37,48,26,.06)}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="nav">
-    <div class="logo">☀</div>
-    <div class="brand">Crono<b>Sol</b></div>
-    <div class="nav-links">
-      <a href="#como-funciona">Cómo funciona</a>
-      <a href="#alertas">Alertas</a>
-      <a href="#impacto">Impacto</a>
-      <a href="/tutoriales">Tutoriales</a>
-      <a href="/optimizar">Calculadora</a>
+<div id="topbar" style="position:sticky;top:0;z-index:50">
+  <div style="max-width:1180px;margin:0 auto;padding:0 26px">
+    <nav style="display:flex;align-items:center;gap:12px;padding:18px 0">
+      <img src="/static/assets/logo.png" alt="CronoSolar" style="width:40px;height:40px;object-fit:contain;flex-shrink:0"/>
+      <div class="brand" style="font-size:22px;font-weight:800;letter-spacing:-.5px">CronoSolar</div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:30px;font-size:14.5px;font-weight:500;color:var(--muted)">
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#servicio">El servicio</a>
+        <a href="#alertas">Alertas</a>
+        <a href="#impacto">Impacto</a>
+        <a href="/tutoriales">Tutoriales</a>
+        <a href="/optimizar" style="background:var(--green);color:#fff;padding:11px 22px;border-radius:999px;font-weight:600">Calculadora</a>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div id="hero" style="position:relative;overflow:hidden;margin-top:-80px;padding-top:80px;min-height:clamp(580px,88vh,820px);display:flex;align-items:center;background-image:linear-gradient(90deg,rgba(233,239,176,.97) 0%,rgba(233,239,176,.72) 36%,rgba(233,239,176,0) 62%),url('/static/assets/hero-sm.png');background-size:cover;background-position:center">
+    <div style="width:100%;max-width:1180px;margin:0 auto;padding:0 26px">
+    <div style="max-width:640px">
+      <div class="fadeup" style="display:inline-flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--bdr);border-radius:999px;padding:7px 15px;font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:22px;font-weight:600">☀ Precio + sol, hora a hora · Gratis</div>
+      <h1 class="fadeup" style="animation-delay:.12s;font-size:clamp(42px,6vw,74px);font-weight:300;letter-spacing:-2.4px;line-height:1.0;margin-bottom:22px;text-wrap:balance">Vive al ritmo <span style="font-weight:800;background:var(--green);-webkit-background-clip:text;background-clip:text;color:transparent">del sol</span>,<br><span style="font-weight:800">no del contador.</span></h1>
+      <p class="fadeup" style="animation-delay:.24s;font-size:17.5px;color:var(--muted);max-width:470px;margin-bottom:32px;text-wrap:pretty">CronoSolar cruza el precio real del mercado eléctrico con la previsión de tu producción solar, y te dice hora a hora cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes.</p>
+      <div class="fadeup" style="animation-delay:.36s;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+        <a href="#calc" style="background:var(--green);color:#fff;padding:16px 32px;border-radius:999px;font-weight:700;font-size:16px">Calcula tu ahorro →</a>
+        <a href="#como-funciona" style="background:var(--cream);border:1px solid var(--bdr);color:var(--ink);padding:15px 28px;border-radius:999px;font-weight:600;font-size:16px">Cómo funciona</a>
+      </div>
+    </div>
     </div>
   </div>
 
-  <div class="hero">
-    <div class="kicker">Guía offline · Autoconsumo solar</div>
-    <h1>Vive al ritmo <em>del sol</em>,<br>no del contador.</h1>
-    <p>CronoSol cruza el precio real del mercado eléctrico con la previsión de tu producción solar, y te dice hora a hora cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes.</p>
-
-    <div class="calc">
-      <div class="calc-h">Calcula tu ahorro en 10 segundos</div>
-      <div class="calc-row">
-        <div>
-          <label>Tu localidad o código postal</label>
-          <input type="text" id="c-place" placeholder="08401 o Granollers">
-        </div>
-        <div>
-          <label>Paneles (kWp)</label>
-          <input type="number" id="c-kwp" value="5" step="0.5" min="0.5">
-        </div>
-        <div>
-          <label>Batería (kWh)</label>
-          <input type="number" id="c-bat" value="10" step="0.5" min="0">
-        </div>
-      </div>
-      <div class="calc-status" id="c-status"></div>
-      <button class="calc-btn" id="c-btn" onclick="calcular()">Calcular ahorro anual estimado</button>
-
-      <div class="calc-result" id="c-result">
-        <div class="stat-pair">
-          <div class="stat"><div class="n" id="c-money" style="color:var(--grn)">—</div><div class="l">€ ahorro anual estimado</div></div>
-          <div class="stat"><div class="n" id="c-co2" style="color:#7FD9C9">—</div><div class="l">kg CO₂ evitados al año</div></div>
-        </div>
-        <a class="calc-cta" id="c-link" href="#">Ver plan detallado de hoy, hora a hora →</a>
-      </div>
-    </div>
-    <div class="hero-note">Sin registro. Datos reales de ESIOS/REE y Open-Meteo.</div>
+<div style="max-width:1180px;margin:0 auto;padding:0 26px">
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:22px 0 0;font-size:13px;font-weight:600;color:var(--muted)">
+    <span style="background:var(--cream);border:1px solid var(--bdr);border-radius:999px;padding:8px 16px">✓ Sin registro</span>
+    <span style="background:var(--cream);border:1px solid var(--bdr);border-radius:999px;padding:8px 16px">✓ Datos oficiales ESIOS/REE</span>
+    <span style="background:var(--cream);border:1px solid var(--bdr);border-radius:999px;padding:8px 16px">✓ Gratis para siempre</span>
   </div>
 
-  <section id="como-funciona">
-    <div class="sec-kicker">Cómo funciona</div>
-    <div class="sec-h">Tres datos, un plan hora a hora</div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-n">01</div>
-        <h3>Configura tu instalación</h3>
-        <p>Ubicación (o compártela desde Telegram), paneles instalados y capacidad de tu batería. Nada de facturas ni contratos que subir.</p>
-      </div>
-      <div class="step">
-        <div class="step-n">02</div>
-        <h3>Cruzamos precio y producción</h3>
-        <p>Precio horario real del pool eléctrico (ESIOS/REE) + tu producción solar prevista (Open-Meteo), hora a hora, para el día que quieras.</p>
-      </div>
-      <div class="step">
-        <div class="step-n">03</div>
-        <h3>Recibes el plan óptimo</h3>
-        <p>Cuándo autoconsumir, cuándo cargar batería con el excedente, cuándo descargarla porque el precio está caro, y cuándo verter a red.</p>
-      </div>
-    </div>
-  </section>
+  <div id="calc" style="background:var(--cream);border:1px solid var(--bdr);border-radius:20px;padding:14px;margin:26px auto 20px;display:grid;grid-template-columns:.95fr 1.15fr .9fr;gap:14px">
 
-  <section id="alertas">
-    <div class="sec-kicker">Un mensaje, no cuatro</div>
-    <div class="sec-h">Así son las alertas de Telegram</div>
-    <div class="alerts-demo">
-      <div class="phone-mock">
-        <div class="tg-bubble">
-          <div class="tg-line b">☀️ Plan de hoy — 2026-07-22</div>
-          <div class="tg-line dim">📍 Granollers | 5 kWp | 10 kWh batería</div>
-          <div class="tg-gap"></div>
-          <div class="tg-line grn b">💶 1,91 € de ahorro estimado</div>
-          <div class="tg-line co2">🌍 ~1,5 kg CO₂ evitados — como no coger el coche 12 km</div>
-          <div class="tg-gap"></div>
-          <div class="tg-line mono">09:00 🔋⬆️ Carga la batería — hay excedente solar</div>
-          <div class="tg-line mono">19:00 🔋⬇️ Descarga la batería — precio alto (152 €/MWh)</div>
-          <div class="tg-gap"></div>
-          <div class="tg-line link">📊 Ver informe completo con gráficos</div>
-          <div class="tg-line link">🔧 Cómo programar tu Huawei FusionSolar</div>
+    <div style="padding:26px 22px;display:flex;flex-direction:column">
+      <h3 style="font-size:clamp(24px,2.4vw,30px);font-weight:800;letter-spacing:-1px;line-height:1.05;margin-bottom:10px">Calcula tu ahorro en segundos</h3>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:8px">Descubre cuánto puedes ahorrar con tu instalación solar. Sin registro.</p>
+      <img src="/static/assets/step-1.png" alt="Cronito con calculadora" style="width:100%;max-width:230px;height:auto;margin-top:auto;align-self:center"/>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--bdr);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:15px">
+      <div>
+        <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600">Tu localidad o código postal</label>
+        <input type="text" id="c-place" placeholder="08401 o Granollers" style="width:100%;padding:13px;background:var(--lemon-lite);border:1px solid var(--bdr);border-radius:12px;color:var(--ink);font-family:var(--mono);font-size:14px;outline:none"/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600">Paneles (kWp)</label>
+          <input type="number" id="c-kwp" value="5" step="0.5" min="0.5" style="width:100%;padding:13px;background:var(--lemon-lite);border:1px solid var(--bdr);border-radius:12px;color:var(--ink);font-family:var(--mono);font-size:14px;outline:none"/>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600">Batería (kWh)</label>
+          <input type="number" id="c-bat" value="10" step="0.5" min="0" style="width:100%;padding:13px;background:var(--lemon-lite);border:1px solid var(--bdr);border-radius:12px;color:var(--ink);font-family:var(--mono);font-size:14px;outline:none"/>
         </div>
       </div>
-      <div class="alerts-text">
-        <p><strong>Un solo mensaje por la mañana</strong>, no una alerta cada hora que nadie tiene tiempo de leer. Programas tu inversor una vez y te olvidas el resto del día.</p>
-        <p>El ahorro en € y el CO₂ evitado van siempre juntos — y con enlace directo a cómo programar las franjas horarias según la marca de tu inversor.</p>
-        <a class="calc-cta" href="https://t.me/Cronosolar_bot" target="_blank" style="display:inline-block;width:auto;padding:10px 20px">Probar el bot →</a>
+      <div id="c-status" style="font-size:12px;min-height:15px;margin-top:-4px;color:var(--muted);font-weight:500"></div>
+      <button id="c-btn" onclick="calcular()" style="margin-top:auto;width:100%;padding:15px;background:var(--green);color:#fff;border:none;border-radius:14px;font-family:var(--ff);font-size:15.5px;font-weight:700;cursor:pointer">Calcular mi ahorro</button>
+    </div>
+
+    <div style="background:var(--lemon-lite);border:1px solid var(--bdr);border-radius:16px;padding:24px;display:flex;flex-direction:column">
+      <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:16px">Tu ahorro estimado</div>
+      <div style="font-size:11.5px;color:var(--muted);font-weight:600">Ahorro anual</div>
+      <div id="c-money" style="font-size:38px;font-weight:800;line-height:1;color:var(--green);margin:2px 0 16px">—</div>
+      <div style="height:1px;background:var(--bdr);margin-bottom:14px"></div>
+      <div style="font-size:11.5px;color:var(--muted);font-weight:600">CO₂ evitado al año</div>
+      <div id="c-co2" style="font-size:24px;font-weight:800;line-height:1;color:var(--lime-d);margin:2px 0 16px">—</div>
+      <div style="height:1px;background:var(--bdr);margin-bottom:14px"></div>
+      <div style="font-size:11.5px;color:var(--muted);font-weight:600">Autoconsumo solar</div>
+      <div id="c-self" style="font-size:24px;font-weight:800;line-height:1;color:var(--ink);margin:2px 0 16px">—</div>
+      <a id="c-link" href="#" style="display:none;margin-top:auto;text-align:center;padding:12px;background:#fff;border:1px solid var(--bdr);border-radius:12px;font-size:12.5px;font-weight:600;color:var(--green)">Ver plan detallado hora a hora →</a>
+    </div>
+
+  </div>
+
+  <!-- feature strip: color mosaic -->
+  <section style="padding:56px 0 8px">
+    <div class="stagger" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+      <div class="lift" style="background:var(--green);border-radius:16px;padding:26px;color:#fff">
+        <img src="/static/assets/ico-eficiente-l.png" alt="" style="width:88px;height:88px;object-fit:contain;margin-bottom:12px"/>
+        <div style="font-weight:700;font-size:17px">Eficiente</div><div style="font-size:13px;color:rgba(255,255,255,.8);margin-top:3px">Aprovechamos cada rayo de sol.</div>
+      </div>
+      <div class="lift" style="background:var(--sun);border-radius:16px;padding:26px;color:var(--ink)">
+        <img src="/static/assets/ico-inteligente-dark.png" alt="" style="width:88px;height:88px;object-fit:contain;margin-bottom:12px"/>
+        <div style="font-weight:700;font-size:17px">Inteligente</div><div style="font-size:13px;color:#4A5A22;margin-top:3px">Precio y producción, hora a hora.</div>
+      </div>
+      <div class="lift" style="background:var(--forest);border-radius:16px;padding:26px;color:#fff">
+        <img src="/static/assets/ico-confiable-l.png" alt="" style="width:88px;height:88px;object-fit:contain;margin-bottom:12px"/>
+        <div style="font-weight:700;font-size:17px">Confiable</div><div style="font-size:13px;color:rgba(255,255,255,.8);margin-top:3px">Datos oficiales, sin humo.</div>
+      </div>
+      <div class="lift" style="background:var(--blue);border-radius:16px;padding:26px;color:#fff">
+        <img src="/static/assets/ico-sostenible-l.png" alt="" style="width:88px;height:88px;object-fit:contain;margin-bottom:12px"/>
+        <div style="font-weight:700;font-size:17px">Sostenible</div><div style="font-size:13px;color:rgba(255,255,255,.8);margin-top:3px">Cada kWh cuenta para el planeta.</div>
       </div>
     </div>
   </section>
 
-  <section id="impacto">
-    <div class="sec-kicker">Impacto primero</div>
-    <div class="sec-h">El ahorro es la prueba de que haces lo correcto</div>
-    <div class="impact">
-      <div class="impact-card money">
-        <div class="n">180 €</div>
-        <div class="l">Ahorro medio anual estimado para una instalación de 5 kWp + 10 kWh de batería en un hogar tipo</div>
+  <section id="como-funciona" style="padding:64px 0 20px">
+    <div style="text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);margin-bottom:12px;font-weight:500">Cómo funciona</div>
+    <h2 style="font-size:clamp(28px,3.8vw,44px);font-weight:800;letter-spacing:-1.2px;text-align:center;margin-bottom:46px">Tres datos, un plan hora a hora</h2>
+    <div class="stagger" style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+      <div class="lift" style="background:var(--green);border-radius:16px;padding:32px;color:#fff">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;margin-bottom:16px">01</div>
+        <h3 style="font-size:19px;font-weight:700;margin-bottom:9px">Configura tu instalación</h3>
+        <p style="font-size:14px;color:rgba(255,255,255,.82)">Ubicación (o compártela desde Telegram), paneles instalados y capacidad de tu batería. Nada de facturas ni contratos que subir.</p>
       </div>
-      <div class="impact-card co2">
-        <div class="n">340 kg</div>
-        <div class="l">CO₂ evitado al año para esa misma instalación, por desplazar consumo de red a autoconsumo solar</div>
+      <div class="lift" style="background:var(--sun);border-radius:16px;padding:32px;color:var(--ink)">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(20,40,10,.14);color:var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;margin-bottom:16px">02</div>
+        <h3 style="font-size:19px;font-weight:700;margin-bottom:9px">Cruzamos precio y producción</h3>
+        <p style="font-size:14px;color:#4A5A22">Precio horario real del pool eléctrico (ESIOS/REE) + tu producción solar prevista (Open-Meteo), hora a hora, para el día que quieras.</p>
       </div>
-      <div class="impact-equiv">
-        <div class="eq"><span>🚗</span> ≈ 2.600 km sin coger el coche</div>
-        <div class="eq"><span>🌳</span> ≈ 15 árboles creciendo un año</div>
-      </div>
-      <div class="impact-method">
-        <strong>¿De dónde sale este número?</strong> Multiplicamos los kWh que autoconsumes directamente del sol por el factor medio de emisión de la red eléctrica española (~0,19 kg CO₂/kWh) — es decir, la energía que ya no compras a la red porque la generas y usas tú mismo.
-      </div>
-      <div class="impact-note">Cifras orientativas — usa la calculadora de arriba para tu caso concreto. No es solo una herramienta de ahorro: es una herramienta climática.</div>
-    </div>
-  </section>
-
-  <section>
-    <div class="ctaband">
-      <h2>Empieza gratis, sin registro</h2>
-      <p>La calculadora completa y las alertas de Telegram son gratis siempre.</p>
-      <div class="cta-row">
-        <a class="btn-primary" href="/optimizar">Abrir la calculadora →</a>
-        <a class="btn-secondary" href="https://t.me/Cronosolar_bot" target="_blank">Alertas por Telegram</a>
+      <div class="lift" style="background:var(--blue);border-radius:16px;padding:32px;color:#fff">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;margin-bottom:16px">03</div>
+        <h3 style="font-size:19px;font-weight:700;margin-bottom:9px">Recibes el plan óptimo</h3>
+        <p style="font-size:14px;color:rgba(255,255,255,.82)">Cuándo autoconsumir, cuándo cargar batería con el excedente, cuándo descargarla porque el precio está caro, y cuándo verter a red.</p>
       </div>
     </div>
   </section>
+</div>
 
-  <footer>CronoSol — Slow Philosophy S.L. · Datos: ESIOS/REE, Open-Meteo</footer>
+<!-- servicio: Time-of-Use -->
+<section id="servicio" style="background:var(--lemon-lite);margin-top:20px">
+  <div style="max-width:1180px;margin:0 auto;padding:70px 26px">
+    <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;margin-bottom:46px">
+      <div>
+        <div style="font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);margin-bottom:12px;font-weight:500">En qué consiste</div>
+        <h2 style="font-size:clamp(28px,3.8vw,44px);font-weight:800;letter-spacing:-1.2px;margin-bottom:16px;text-wrap:balance">No te avisamos cada hora: te damos la previsión del día completo.</h2>
+        <p style="font-size:15.5px;color:var(--muted);margin-bottom:14px;text-wrap:pretty">CronoSolar te pasa por la mañana la previsión de cómo va a ir el día — precio y sol hora a hora — para que programes tú mismo las <strong style="color:var(--ink)">franjas horarias de carga y descarga (Time-of-Use)</strong> de tu inversor y batería. Lo configuras una vez y te olvidas el resto del día.</p>
+        <p style="font-size:14px;color:var(--muted)">Cronito te dice qué toca en cada momento: cargar con el sol, verter el excedente, descargar cuando el precio sube o comprar de red solo cuando de verdad conviene.</p>
+      </div>
+      <div style="display:flex;justify-content:center;position:relative">
+        <img class="floaty" src="/static/assets/forecast.png" alt="Cronito con previsión de mejora" style="width:88%;max-width:360px;height:auto"/>
+      </div>
+    </div>
+    <div class="stagger" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+      <div class="lift" style="background:var(--cream);border:1px solid var(--bdr);border-radius:16px;padding:18px 18px 22px;text-align:center">
+        <img src="/static/assets/step-1.png" alt="" style="width:100%;max-width:160px;height:158px;object-fit:contain"/>
+        <div style="font-weight:700;font-size:15.5px;margin-top:8px">Carga con sol</div>
+        <div style="font-size:12.5px;color:var(--muted)">Excedente → batería</div>
+      </div>
+      <div class="lift" style="background:var(--cream);border:1px solid var(--bdr);border-radius:16px;padding:18px 18px 22px;text-align:center">
+        <img src="/static/assets/step-2.png" alt="" style="width:100%;max-width:160px;height:158px;object-fit:contain"/>
+        <div style="font-weight:700;font-size:15.5px;margin-top:8px">Vierte a red</div>
+        <div style="font-size:12.5px;color:var(--muted)">Si sobra energía</div>
+      </div>
+      <div class="lift" style="background:var(--cream);border:1px solid var(--bdr);border-radius:16px;padding:18px 18px 22px;text-align:center">
+        <img src="/static/assets/step-3.png" alt="" style="width:100%;max-width:160px;height:158px;object-fit:contain"/>
+        <div style="font-weight:700;font-size:15.5px;margin-top:8px">Descarga en pico</div>
+        <div style="font-size:12.5px;color:var(--muted)">Precio alto → casa</div>
+      </div>
+      <div class="lift" style="background:var(--cream);border:1px solid var(--bdr);border-radius:16px;padding:18px 18px 22px;text-align:center">
+        <img src="/static/assets/step-4.png" alt="" style="width:100%;max-width:160px;height:158px;object-fit:contain"/>
+        <div style="font-weight:700;font-size:15.5px;margin-top:8px">Compra si toca</div>
+        <div style="font-size:12.5px;color:var(--muted)">Solo cuando conviene</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div style="max-width:1180px;margin:0 auto;padding:0 26px">
+  <section id="alertas" style="padding:70px 0">
+    <div style="text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);margin-bottom:12px;font-weight:500">Un mensaje, no cuatro</div>
+    <h2 style="font-size:clamp(28px,3.8vw,44px);font-weight:800;letter-spacing:-1.2px;text-align:center;margin-bottom:46px">Así son las alertas de Telegram</h2>
+    <div style="display:grid;grid-template-columns:.9fr 1.1fr;gap:44px;align-items:center">
+      <div style="background:#17212b;border-radius:16px;padding:16px;max-width:340px;margin:0 auto">
+        <div style="background:#1e2c3a;border-radius:16px;padding:15px 17px;font-size:12.5px">
+          <div style="margin-bottom:6px;font-weight:700;color:#fff">☀️ Plan de hoy — 2026-07-22</div>
+          <div style="margin-bottom:6px;color:#8a97a3;font-size:11.5px">📍 Granollers | 5 kWp | 10 kWh batería</div>
+          <div style="height:6px"></div>
+          <div style="margin-bottom:6px;font-weight:700;color:#8fd67a">💶 1,91 € de ahorro estimado</div>
+          <div style="margin-bottom:6px;color:#7FD9C9;font-size:11.5px">🌍 ~1,5 kg CO₂ evitados — como no coger el coche 12 km</div>
+          <div style="height:6px"></div>
+          <div style="margin-bottom:6px;font-family:var(--mono);font-size:11px;color:#c9d3db">09:00 🔋⬆️ Carga la batería — hay excedente solar</div>
+          <div style="margin-bottom:6px;font-family:var(--mono);font-size:11px;color:#c9d3db">19:00 🔋⬇️ Descarga la batería — precio alto (152 €/MWh)</div>
+          <div style="height:6px"></div>
+          <div style="margin-bottom:6px;color:#6ab7f5;font-size:11.5px">📊 Ver informe completo con gráficos</div>
+          <div style="color:#6ab7f5;font-size:11.5px">🔧 Cómo programar tu Huawei FusionSolar</div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:15.5px;color:var(--muted);margin-bottom:16px"><strong style="color:var(--ink)">Un solo mensaje por la mañana</strong>, no una alerta cada hora que nadie tiene tiempo de leer. Programas tu inversor una vez y te olvidas el resto del día.</p>
+        <p style="font-size:15.5px;color:var(--muted);margin-bottom:22px">El ahorro en € y el CO₂ evitado van siempre juntos — y con enlace directo a cómo programar las franjas horarias según la marca de tu inversor.</p>
+        <a href="https://t.me/Cronosolar_bot" target="_blank" style="display:inline-block;background:var(--green);color:#fff;padding:14px 28px;border-radius:999px;font-size:15px;font-weight:600">Probar el bot →</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- impact: immersive forest band -->
+<div id="impacto" style="position:relative;background-image:linear-gradient(rgba(10,46,34,.82),rgba(10,46,34,.88)),url('/static/assets/forest.png');background-size:cover;background-position:center;background-attachment:fixed;color:#EAF3D8;overflow:hidden">
+  <div style="max-width:1180px;margin:0 auto;padding:110px 26px;position:relative">
+    <img src="/static/assets/dec-hug-light.png" alt="" style="position:absolute;top:60px;right:10px;width:190px;height:auto;opacity:.16;pointer-events:none"/>
+    <div class="reveal" style="text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--sun);margin-bottom:16px;font-weight:600">Impacto primero</div>
+    <h2 class="reveal" style="font-size:clamp(30px,4.4vw,56px);font-weight:300;letter-spacing:-1.6px;text-align:center;margin-bottom:70px;color:#fff;text-wrap:balance;max-width:820px;margin-left:auto;margin-right:auto">El ahorro es la prueba de <span style="font-weight:800">que haces lo correcto.</span></h2>
+    <div class="stagger" style="display:grid;grid-template-columns:1fr 1fr;gap:56px;text-align:center;border-top:1px solid rgba(234,243,216,.16);border-bottom:1px solid rgba(234,243,216,.16);padding:56px 0">
+      <div style="border-right:1px solid rgba(234,243,216,.16)">
+        <div style="font-size:clamp(56px,8vw,104px);font-weight:800;line-height:.9;color:#fff;letter-spacing:-2px" data-count="180" data-suffix=" €">180 €</div>
+        <div style="font-size:14px;color:#B9CE96;margin-top:16px;max-width:340px;margin-left:auto;margin-right:auto">Ahorro medio anual estimado para una instalación de 5 kWp + 10 kWh de batería en un hogar tipo</div>
+      </div>
+      <div>
+        <div style="font-size:clamp(56px,8vw,104px);font-weight:800;line-height:.9;color:var(--sun);letter-spacing:-2px" data-count="340" data-suffix=" kg">340 kg</div>
+        <div style="font-size:14px;color:#B9CE96;margin-top:16px;max-width:340px;margin-left:auto;margin-right:auto">CO₂ evitado al año para esa misma instalación, por desplazar consumo de red a autoconsumo solar</div>
+      </div>
+    </div>
+    <div class="reveal" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:40px 0 32px">
+      <div style="background:rgba(234,243,216,.1);border:1px solid rgba(234,243,216,.18);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;color:#EAF3D8">🚗 ≈ 2.600 km sin coger el coche</div>
+      <div style="background:rgba(234,243,216,.1);border:1px solid rgba(234,243,216,.18);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;color:#EAF3D8">🌳 ≈ 15 árboles creciendo un año</div>
+    </div>
+    <div class="reveal" style="font-size:13.5px;color:#B9CE96;line-height:1.7;max-width:800px;margin:0 auto;text-align:center">
+      <strong style="color:#fff">¿De dónde sale este número?</strong> Multiplicamos los kWh que autoconsumes directamente del sol por el factor medio de emisión de la red eléctrica española (~0,19 kg CO₂/kWh) — es decir, la energía que ya no compras a la red porque la generas y usas tú mismo. Cifras orientativas: no es solo una herramienta de ahorro, es una herramienta climática.
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1180px;margin:0 auto;padding:0 26px">
+  <section style="padding:74px 0">
+    <div style="position:relative;background:var(--forest);border-radius:20px;padding:52px 40px;display:flex;align-items:center;gap:36px;flex-wrap:wrap;justify-content:center;text-align:center;overflow:hidden">
+      <img src="/static/assets/battery-l.png" alt="Cronito con batería" style="width:200px;height:auto;flex-shrink:0"/>
+      <div style="max-width:560px">
+        <h2 style="font-size:clamp(26px,3.4vw,38px);font-weight:800;letter-spacing:-1px;margin-bottom:12px;color:#fff">Empieza gratis, sin registro</h2>
+        <p style="color:#eef6d8;font-size:15.5px;margin-bottom:28px">La calculadora completa y las alertas de Telegram son gratis siempre.</p>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+          <a href="/optimizar" style="background:#fff;color:var(--forest);padding:15px 32px;border-radius:999px;font-weight:700;font-size:15.5px">Abrir la calculadora →</a>
+          <a href="https://t.me/Cronosolar_bot" target="_blank" style="border:1.5px solid rgba(255,255,255,.8);color:#fff;padding:14px 30px;border-radius:999px;font-weight:600;font-size:15.5px">Alertas por Telegram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="padding:20px 0 48px;display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap;font-size:12.5px;color:var(--muted);border-top:1px solid var(--bdr)">
+    <img src="/static/assets/logo.png" alt="" style="width:26px;height:26px;object-fit:contain"/>
+    <span style="font-weight:600;color:var(--ink)">CronoSolar</span> — Slow Philosophy S.L. · Datos: ESIOS/REE, Open-Meteo
+  </footer>
 </div>
 
 <script>
+// ── Animaciones on-scroll (reveal / stagger / count-up / header / parallax) ──
+function initAnims() {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      if (e.target.classList.contains('stagger')) {
+        [...e.target.children].forEach((k, i) => { k.style.transitionDelay = (i * 110) + 'ms'; });
+      }
+      io.unobserve(e.target);
+    });
+  }, { threshold: 0.16 });
+  document.querySelectorAll('.stagger, .reveal').forEach((el) => io.observe(el));
+
+  const cio = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      countUp(e.target);
+      cio.unobserve(e.target);
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('[data-count]').forEach((el) => cio.observe(el));
+
+  const hero = document.getElementById('hero');
+  const topbar = document.getElementById('topbar');
+  const onScroll = () => {
+    const y = window.scrollY || 0;
+    if (hero && y < 900) hero.style.backgroundPositionY = (50 + y * 0.04) + '%';
+    if (topbar) topbar.classList.toggle('scrolled', y > 30);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+function countUp(el) {
+  const target = +el.getAttribute('data-count');
+  const suffix = el.getAttribute('data-suffix') || '';
+  const dur = 1400, t0 = performance.now();
+  const tick = (t) => {
+    const p = Math.min(1, (t - t0) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(target * eased).toLocaleString('es-ES') + suffix;
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+setTimeout(initAnims, 60);
+
+// ── Calculadora: datos reales (Nominatim + /api/optimize), no simulados ──
 async function geocode(q) {
   const isCP = /^\d{4,5}$/.test(q);
   const url = isCP
@@ -265,16 +346,15 @@ async function calcular() {
   const kwp = +document.getElementById('c-kwp').value;
   const bat = +document.getElementById('c-bat').value;
 
-  if (!place) { status.style.color = '#F59E0B'; status.textContent = 'Escribe tu localidad o código postal.'; return; }
+  if (!place) { status.style.color = '#B45309'; status.textContent = 'Escribe tu localidad o código postal.'; return; }
 
   btn.disabled = true; btn.textContent = 'Calculando...';
-  status.style.color = 'var(--dim)'; status.textContent = 'Buscando tu ubicación...';
+  status.style.color = 'var(--muted)'; status.textContent = 'Buscando tu ubicación y datos de ESIOS/REE...';
 
   try {
     const loc = await geocode(place);
-    if (!loc) { status.style.color = '#F59E0B'; status.textContent = 'No he encontrado esa localidad.'; btn.disabled = false; btn.textContent = 'Calcular ahorro anual estimado'; return; }
+    if (!loc) { status.style.color = '#B45309'; status.textContent = 'No he encontrado esa localidad.'; btn.disabled = false; btn.textContent = 'Calcular mi ahorro'; return; }
 
-    status.textContent = 'Consultando precios y producción solar...';
     const tomorrow = new Date(Date.now() + 864e5).toISOString().split('T')[0];
     const r = await fetch(`/api/optimize?target_date=${tomorrow}`, {
       method: 'POST',
@@ -284,19 +364,22 @@ async function calcular() {
     if (!r.ok) throw new Error('API error');
     const d = await r.json();
 
-    const annualSavings = d.total_savings_eur * 365;
-    const co2 = d.total_solar_self_consumed_kwh * 0.19 * 365;
+    const annualMoney = Math.round(d.total_savings_eur * 365);
+    const annualCo2 = Math.round(d.total_solar_self_consumed_kwh * 0.19 * 365);
+    const annualSelf = Math.round(d.total_solar_self_consumed_kwh * 365);
 
-    document.getElementById('c-money').textContent = Math.round(annualSavings) + ' €';
-    document.getElementById('c-co2').textContent = Math.round(co2) + ' kg';
-    document.getElementById('c-link').href = `/optimizar?lat=${loc.lat}&lon=${loc.lon}&kwp=${kwp}&battery=${bat}&consumption=12&date=${tomorrow}`;
-    document.getElementById('c-result').classList.add('show');
+    document.getElementById('c-money').textContent = annualMoney + ' €';
+    document.getElementById('c-co2').textContent = annualCo2 + ' kg';
+    document.getElementById('c-self').textContent = annualSelf.toLocaleString('es-ES') + ' kWh';
+    const link = document.getElementById('c-link');
+    link.href = `/optimizar?lat=${loc.lat}&lon=${loc.lon}&kwp=${kwp}&battery=${bat}&consumption=12&date=${tomorrow}`;
+    link.style.display = 'block';
     status.textContent = '';
   } catch (e) {
-    status.style.color = '#F59E0B';
+    status.style.color = '#B45309';
     status.textContent = 'No se ha podido calcular ahora mismo. Prueba de nuevo en un minuto.';
   }
-  btn.disabled = false; btn.textContent = 'Calcular ahorro anual estimado';
+  btn.disabled = false; btn.textContent = 'Calcular mi ahorro';
 }
 
 document.getElementById('c-place').addEventListener('keydown', e => { if (e.key === 'Enter') calcular(); });

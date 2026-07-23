@@ -57,7 +57,7 @@ def save_users(users):
 
 async def geocode_place(query: str):
     """Devuelve (lat, lon, nombre) o None si no se encuentra."""
-    async with httpx.AsyncClient(timeout=10, headers={"User-Agent": "CronoSol/1.0"}) as client:
+    async with httpx.AsyncClient(timeout=10, headers={"User-Agent": "CronoSolar/1.0"}) as client:
         resp = await client.get(
             "https://nominatim.openstreetmap.org/search",
             params={"q": f"{query}, Spain", "format": "json", "limit": 1, "accept-language": "es"},
@@ -75,7 +75,7 @@ async def geocode_place(query: str):
 async def reverse_geocode(lat: float, lon: float):
     """Devuelve un nombre legible para unas coordenadas, o 'lat, lon' si falla."""
     try:
-        async with httpx.AsyncClient(timeout=10, headers={"User-Agent": "CronoSol/1.0"}) as client:
+        async with httpx.AsyncClient(timeout=10, headers={"User-Agent": "CronoSolar/1.0"}) as client:
             resp = await client.get(
                 "https://nominatim.openstreetmap.org/reverse",
                 params={"lat": lat, "lon": lon, "format": "json", "accept-language": "es"},
@@ -298,7 +298,7 @@ async def handle_message(msg, users):
         save_users(users)
         await send_message(
             chat_id,
-            "☀️ *CronoSol* — Optimiza tu autoconsumo solar\n\n"
+            "☀️ *CronoSolar* — Optimiza tu autoconsumo solar\n\n"
             "Te hago 5 preguntas rápidas y ya está. Puedes saltarte cualquiera "
             "escribiendo /plan para usar valores por defecto.\n\n"
             "Primero: ¿dónde está tu instalación? Comparte tu ubicación o "
