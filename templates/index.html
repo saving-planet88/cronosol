@@ -303,13 +303,20 @@ async function run() {
     return;
   }
 
-  const hours = api.hours.map(h=>({
-    hour:h.hour, priceMwh:h.price_eur_mwh, priceKwh:h.price_eur_kwh,
-    solar:h.solar_kw, consumption:h.consumption_kw,
-    action: ACTION_MAP[h.action] || h.action,
-    soc:h.battery_soc_kwh, savings:h.savings_eur,
-    exported: h.action==='export' ? Math.max(0, h.solar_kw - h.consumption_kw) : 0,
-  }));
+  let prevSoc = 0;
+  const hours = api.hours.map(h=>{
+    const discharged = h.action==='battery_discharge' ? Math.max(0, prevSoc - h.battery_soc_kwh) : 0;
+    prevSoc = h.battery_soc_kwh;
+    const gridKwh = Math.max(0, h.consumption_kw - h.solar_kw - discharged);
+    return {
+      hour:h.hour, priceMwh:h.price_eur_mwh, priceKwh:h.price_eur_kwh,
+      solar:h.solar_kw, consumption:h.consumption_kw,
+      action: ACTION_MAP[h.action] || h.action,
+      soc:h.battery_soc_kwh, savings:h.savings_eur,
+      cost: gridKwh * h.price_eur_kwh,
+      exported: h.action==='export' ? Math.max(0, h.solar_kw - h.consumption_kw) : 0,
+    };
+  });
 
   const totalSav = api.total_savings_eur;
   const totalNoOpt = api.total_grid_cost_no_optim_eur;
@@ -361,8 +368,8 @@ async function run() {
   }).join('');
 
   // ── Table ──
-  let tbl=`<table><thead><tr><th>Hora</th><th>Precio</th><th>Solar</th><th>Consumo</th><th>Accion</th><th>Bateria</th><th>Ahorro</th></tr></thead><tbody>`;
-  hours.forEach(h=>{const a=ACT[h.action];tbl+=`<tr><td>${String(h.hour).padStart(2,'0')}:00</td><td>${h.priceMwh.toFixed(1)}</td><td style="color:${C_SOLAR}">${h.solar.toFixed(2)}</td><td>${h.consumption.toFixed(2)}</td><td><span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span></td><td style="color:${C_BAT}">${h.soc.toFixed(1)}</td><td style="color:${h.savings>0?'var(--green)':'var(--muted)'}">${h.savings.toFixed(3)} €</td></tr>`;});
+  let tbl=`<table><thead><tr><th>Hora</th><th>Precio</th><th>Solar</th><th>Consumo</th><th>Accion</th><th>Bateria</th><th title="Lo que pagas esa hora por la parte que sí viene de la red">Coste hora</th><th title="Lo que te ahorras esa hora frente a no tener solar/bateria">Ahorro</th></tr></thead><tbody>`;
+  hours.forEach(h=>{const a=ACT[h.action];tbl+=`<tr><td>${String(h.hour).padStart(2,'0')}:00</td><td>${h.priceMwh.toFixed(1)}</td><td style="color:${C_SOLAR}">${h.solar.toFixed(2)}</td><td>${h.consumption.toFixed(2)}</td><td><span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span></td><td style="color:${C_BAT}">${h.soc.toFixed(1)}</td><td style="color:${h.cost>0?'var(--brick)':'var(--muted)'}">${h.cost.toFixed(3)} €</td><td style="color:${h.savings>0?'var(--green)':'var(--muted)'}">${h.savings.toFixed(3)} €</td></tr>`;});
   tbl+=`</tbody></table>`;
 
   // ── Render all ──

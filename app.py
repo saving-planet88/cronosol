@@ -331,77 +331,90 @@ def optimize(
     battery_kwh: float,
 ) -> list[HourlySlot]:
     """
-    Algoritmo greedy de optimización:
     - Prioridad 1: autoconsumo directo (solar → consumo)
-    - Prioridad 2: cargar batería con excedente solar
-    - Prioridad 3: descargar batería en horas caras
+    - Prioridad 2: cargar batería con excedente solar (cronológico: no se
+      puede cargar con sol que aún no ha salido)
+    - Prioridad 3: descargar batería en las horas de déficit más caras del
+      día, asignando la carga disponible por orden de precio pero respetando
+      SIEMPRE cuánta energía se ha acumulado ya en ese punto del día (no se
+      puede gastar por la mañana una carga que todavía no existe)
     - Prioridad 4: verter excedente a red
     - Prioridad 5: importar de red lo que falte
     """
-    soc = 0.0  # Estado de carga actual
     max_charge_rate = battery_kwh * 0.5 if battery_kwh > 0 else 0  # C/2 max
     export_price_factor = 0.06  # €/kWh compensación excedentes (media mercado)
 
-    # Primero: identificar las horas más caras para descarga de batería
-    price_ranking = sorted(range(24), key=lambda h: prices_mwh[h], reverse=True)
-    discharge_hours = set(price_ranking[:6]) if battery_kwh > 0 else set()
+    net_list = [solar_kw[h] - consumption_kw[h] for h in range(24)]  # +excedente / -déficit
 
+    # Pasada 1 (cronológica): simula solo la carga con excedente solar, para
+    # saber cuánta energía hay realmente disponible en cada momento del día.
+    soc = 0.0
+    soc_ceiling = [0.0] * 24  # energía acumulada hasta el final de cada hora, sin descargar
+    charged_list = [0.0] * 24
+    for h in range(24):
+        net = net_list[h]
+        if net >= 0 and battery_kwh > 0 and soc < battery_kwh:
+            can_charge = min(net, max_charge_rate, battery_kwh - soc)
+            soc += can_charge
+            charged_list[h] = can_charge
+        soc_ceiling[h] = soc
+
+    # Pasada 2: reparte la descarga entre las horas de déficit por precio
+    # descendente. Antes se fijaba un top-6 global por precio, lo que
+    # desperdiciaba huecos en horas de madrugada donde la batería aún no
+    # tenía carga (quedando fuera horas caras y sí alcanzables, como las
+    # últimas de la noche). Ahora cada hora solo recibe lo que realmente
+    # queda disponible en ese punto de la cronología.
+    discharge_alloc = [0.0] * 24
+    if battery_kwh > 0:
+        deficit_hours = [h for h in range(24) if net_list[h] < 0]
+        deficit_hours.sort(key=lambda h: prices_mwh[h], reverse=True)
+        for h in deficit_hours:
+            want = min(-net_list[h], max_charge_rate)
+            if want <= 0:
+                continue
+            already_committed = sum(discharge_alloc[h2] for h2 in range(h + 1))
+            available = max(0.0, soc_ceiling[h] - already_committed)
+            discharge_alloc[h] = min(want, available)
+
+    # Pasada 3: construye los tramos hora a hora con las decisiones ya tomadas
     slots = []
+    soc = 0.0
     for h in range(24):
         price_kwh = prices_mwh[h] / 1000.0
         solar = solar_kw[h]
         demand = consumption_kw[h]
-        net = solar - demand  # positivo = excedente, negativo = déficit
+        net = net_list[h]
         action = "grid"
         savings = 0.0
-        charged = 0.0
-        discharged = 0.0
-        exported = 0.0
-        grid_import = 0.0
 
         if net >= 0:
-            # Hay excedente solar
             action = "solar"
             savings = demand * price_kwh  # todo el consumo cubierto por solar
 
             surplus = net
-            # Cargar batería con excedente
-            if battery_kwh > 0 and soc < battery_kwh:
-                can_charge = min(surplus, max_charge_rate, battery_kwh - soc)
-                soc += can_charge
-                surplus -= can_charge
-                charged = can_charge
-                if can_charge > 0:
-                    action = "battery_charge"
+            charged = charged_list[h]
+            soc += charged
+            surplus -= charged
+            if charged > 0:
+                action = "battery_charge"
 
-            # Verter el resto a red
             if surplus > 0:
-                exported = surplus
                 savings += surplus * export_price_factor
                 if charged == 0:
                     action = "export"
         else:
-            # Déficit: consumo > producción solar
             solar_covered = solar
-            deficit = -net
-
-            # Intentar cubrir con batería si es hora cara
-            if battery_kwh > 0 and h in discharge_hours and soc > 0:
-                can_discharge = min(deficit, max_charge_rate, soc)
-                soc -= can_discharge
-                deficit -= can_discharge
-                discharged = can_discharge
+            discharged = discharge_alloc[h]
+            soc -= discharged
+            if discharged > 0:
                 action = "battery_discharge"
-                savings = (solar_covered + discharged) * price_kwh
-            else:
-                savings = solar_covered * price_kwh
-
-            grid_import = deficit
+            savings = (solar_covered + discharged) * price_kwh
 
         slots.append(HourlySlot(
             hour=h,
             price_eur_mwh=round(prices_mwh[h], 2),
-            price_eur_kwh=round(prices_mwh[h] / 1000, 4),
+            price_eur_kwh=round(price_kwh, 4),
             solar_kw=round(solar, 3),
             consumption_kw=round(demand, 3),
             action=action,
