@@ -1,0 +1,30 @@
+<svg width="360" height="440" viewBox="0 0 360 440" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="360" height="440" rx="28" fill="#0E3D2C"/>
+  <rect x="14" y="14" width="332" height="412" rx="20" fill="#FBFCEF"/>
+  <rect x="14" y="14" width="332" height="56" rx="20" fill="#157A4E"/>
+  <rect x="14" y="50" width="332" height="20" fill="#157A4E"/>
+  <text x="34" y="49" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#fff">Gestión de batería · SOC</text>
+
+  <text x="34" y="100" font-family="Arial,sans-serif" font-size="12" fill="#5C6B39" font-weight="700">NUEVO TRAMO</text>
+  <rect x="34" y="112" width="292" height="70" rx="10" fill="#E9EFB0" stroke="#8CC63F" stroke-width="2" stroke-dasharray="5 5"/>
+  <text x="50" y="140" font-family="Arial,sans-serif" font-size="11" fill="#5C6B39">Tipo de tramo</text>
+  <rect x="50" y="148" width="200" height="24" rx="12" fill="#B23A48"/>
+  <text x="150" y="164" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">Descarga forzada</text>
+
+  <text x="34" y="204" font-family="Arial,sans-serif" font-size="12" fill="#5C6B39" font-weight="700">HORARIO</text>
+  <rect x="34" y="216" width="140" height="40" rx="10" fill="#fff" stroke="#D9E0A2" stroke-width="2"/>
+  <text x="104" y="241" font-family="monospace" font-size="14" fill="#24301A" text-anchor="middle">19:00</text>
+  <rect x="186" y="216" width="140" height="40" rx="10" fill="#fff" stroke="#D9E0A2" stroke-width="2"/>
+  <text x="256" y="241" font-family="monospace" font-size="14" fill="#24301A" text-anchor="middle">23:00</text>
+
+  <text x="34" y="288" font-family="Arial,sans-serif" font-size="12" fill="#5C6B39" font-weight="700">SOC MÍNIMO</text>
+  <rect x="34" y="300" width="292" height="14" rx="7" fill="#D9E0A2"/>
+  <rect x="34" y="300" width="70" height="14" rx="7" fill="#3E7CC8"/>
+  <circle cx="104" cy="307" r="10" fill="#fff" stroke="#3E7CC8" stroke-width="3"/>
+  <text x="290" y="312" font-family="monospace" font-size="11" fill="#5C6B39">20%</text>
+
+  <rect x="34" y="336" width="292" height="1" fill="#D9E0A2"/>
+
+  <rect x="34" y="356" width="292" height="46" rx="23" fill="#157A4E"/>
+  <text x="180" y="384" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">Añadir tramo</text>
+</svg>

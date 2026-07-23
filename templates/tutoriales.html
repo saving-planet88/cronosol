@@ -78,7 +78,7 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
     <span><i style="background:var(--bdr)"></i>El resto del día, automático</span>
   </div>
 
-  <div class="note">⚠️ Los pasos de abajo están traducidos y resumidos a partir de la documentación oficial de cada fabricante (enlazada en cada tarjeta). Los menús exactos pueden variar según el modelo y la versión de firmware/app — si algo no coincide con tu equipo, la fuente oficial manda, y si sigues sin verlo, contacta con tu instalador.</div>
+  <div class="note">⚠️ Los pasos de abajo están traducidos y resumidos a partir de la documentación oficial de cada fabricante (enlazada en cada tarjeta). Las ilustraciones son representaciones orientativas propias, no capturas reales de ninguna app — los menús exactos pueden variar según el modelo y la versión de firmware/app. Si algo no coincide con tu equipo, la fuente oficial manda, y si sigues sin verlo, contacta con tu instalador.</div>
 
   <div class="brands">
 
@@ -89,6 +89,7 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
+        <img src="/static/assets/tutoriales/huawei-mockup.svg" alt="Ilustración orientativa: pantalla de control de batería con franjas de carga y descarga (representación propia, no una captura real de la app)" style="width:100%;max-width:280px;display:block;margin:0 auto 20px;border-radius:16px"/>
         <p class="lead">En Huawei/LUNA2000 la función se llama <strong>modo TOU (Time of Use)</strong>: programas manualmente los tramos en los que la batería carga y descarga. Un uso típico: dejar que la red cargue la batería de madrugada (barata) y descargarla en las horas caras del día.</p>
         <ol class="steps">
           <li>Abre la app FusionSolar e inicia sesión (como instalador si tienes ese acceso, o como propietario).</li>
@@ -113,6 +114,7 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
+        <img src="/static/assets/tutoriales/fronius-mockup.svg" alt="Ilustración orientativa: pantalla de gestión de batería con un tramo de descarga forzada (representación propia, no una captura real de la app)" style="width:100%;max-width:280px;display:block;margin:0 auto 20px;border-radius:16px"/>
         <p class="lead">Fronius llama a esta función <strong>Time-of-Use</strong> (control de batería por franjas horarias). No todos los inversores domésticos la traen activada de fábrica — si no la ves, consulta con tu instalador.</p>
         <ol class="steps">
           <li>Entra en Solar.web con tu cuenta.</li>
@@ -137,6 +139,7 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
+        <img src="/static/assets/tutoriales/victron-mockup.svg" alt="Ilustración orientativa: pantalla de carga programada con dos tramos y su SOC objetivo (representación propia, no una captura real de la app)" style="width:100%;max-width:280px;display:block;margin:0 auto 20px;border-radius:16px"/>
         <p class="lead">En Victron se llama <strong>Scheduled Charging</strong> y vive en el menú ESS del dispositivo GX, gestionado desde VRM.</p>
         <ol class="steps">
           <li>Entra en <span class="field">vrm.victronenergy.com</span> con tu cuenta.</li>
@@ -148,7 +151,7 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <p class="lead" style="font-size:12.5px;color:var(--muted)">Si la batería llega al SOC objetivo antes de que acabe el tramo, deja de cargar pero <strong>no descarga</strong> (salvo corte de red) — se queda a tope sin gastar ciclos de más, dejando hueco para cargar con el sol después.</p>
         <div class="src-label">Fuente oficial <span style="text-transform:none;font-weight:400">— solo disponible en inglés, Victron no publica esta guía en español</span></div>
         <div class="links">
-          <a class="off-link" href="https://www.victronenergy.com/live/ess:scheduled_charging" target="_blank" rel="noopener">📄 ESS: Scheduled Charging — Victron Energy (EN)</a>
+          <a class="off-link" href="https://www.victronenergy.com/media/pg/Energy_Storage_System/en/configuration.html" target="_blank" rel="noopener">📄 ESS Configuration — sección 4.4 "Scheduled charge levels" (Victron Energy, EN)</a>
           <a class="off-link" href="https://www.victronenergy.com/upload/documents/Energy_Storage_System/6292-ESS_design_and_installation_manual-pdf-en.pdf" target="_blank" rel="noopener">📄 ESS Design and Installation Manual (PDF, EN, Rev 11)</a>
         </div>
       </div></div>
