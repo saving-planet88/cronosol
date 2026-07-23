@@ -43,10 +43,21 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
 .brand-body-in{padding:0 20px 20px}
 .brand-body .lead{font-size:14px;color:var(--ink);line-height:1.6;margin-bottom:14px}
 .brand-body .lead:last-child{margin-bottom:0}
+.steps{list-style:none;counter-reset:step;margin:14px 0 16px;padding:0}
+.steps li{counter-increment:step;position:relative;padding-left:34px;margin-bottom:12px;font-size:13.5px;color:var(--ink);line-height:1.55}
+.steps li::before{content:counter(step);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:7px;background:var(--green);color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.steps li:last-child{margin-bottom:0}
+.field{font-family:var(--mono);font-size:12px;background:var(--lemon-lite);border-radius:5px;padding:1px 6px}
+.src-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;font-weight:600}
 .links{display:flex;flex-direction:column;gap:8px}
 .off-link{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#fff;border:1px solid var(--bdr);border-radius:10px;font-size:13.5px;font-weight:600;color:var(--ink);text-decoration:none}
 .off-link:hover{border-color:var(--green);color:var(--green)}
 .brand-warn{font-size:12.5px;color:#8A5A0E;background:#F2D11122;border-radius:10px;padding:8px 12px;margin-top:4px}
+.tou-diagram{display:flex;align-items:center;gap:2px;height:34px;border-radius:8px;overflow:hidden;margin:18px 0 8px}
+.tou-diagram div{height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:#fff;font-weight:600}
+.tou-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-bottom:4px}
+.tou-legend span{display:inline-flex;align-items:center;gap:5px}
+.tou-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
 
 .ctaband{margin-top:40px;background:var(--forest);border-radius:20px;padding:32px;text-align:center}
 .ctaband p{color:#DCEBC8;font-size:14px;margin-bottom:18px}
@@ -66,7 +77,18 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
     <p class="intro">CronoSolar te dice a qué hora conviene cargar o descargar la batería — pero quien ejecuta ese plan es tu inversor. Aquí tienes el enlace directo a la documentación oficial de cada fabricante para programar las franjas horarias.</p>
   </div>
 
-  <div class="note">⚠️ Los menús exactos varían según el modelo y la versión de firmware/app — por eso enlazamos siempre a la fuente oficial del fabricante en vez de describir pasos que pueden quedar desactualizados. Si algo no coincide con tu equipo, contacta con tu instalador.</div>
+  <div class="tou-diagram">
+    <div style="flex:6;background:var(--green)">CARGA 00–06h</div>
+    <div style="flex:12;background:var(--bdr);color:var(--muted)">AUTOCONSUMO</div>
+    <div style="flex:5;background:#B23A48">DESCARGA 19–24h</div>
+  </div>
+  <div class="tou-legend">
+    <span><i style="background:var(--green)"></i>Carga programada (red barata / sol)</span>
+    <span><i style="background:#B23A48"></i>Descarga programada (precio caro)</span>
+    <span><i style="background:var(--bdr)"></i>El resto del día, automático</span>
+  </div>
+
+  <div class="note">⚠️ Los pasos de abajo están traducidos y resumidos a partir de la documentación oficial de cada fabricante (enlazada en cada tarjeta). Los menús exactos pueden variar según el modelo y la versión de firmware/app — si algo no coincide con tu equipo, la fuente oficial manda, y si sigues sin verlo, contacta con tu instalador.</div>
 
   <div class="brands">
 
@@ -77,9 +99,18 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <p class="lead">En la app FusionSolar, la función se llama <strong>"Scheduled Charging"</strong> (carga programada) dentro de los parámetros de batería. Documentación oficial de Huawei:</p>
+        <p class="lead">En Huawei/LUNA2000 la función se llama <strong>modo TOU (Time of Use)</strong>: programas manualmente los tramos en los que la batería carga y descarga. Un uso típico: dejar que la red cargue la batería de madrugada (barata) y descargarla en las horas caras del día.</p>
+        <ol class="steps">
+          <li>Abre la app FusionSolar e inicia sesión (como instalador si tienes ese acceso, o como propietario).</li>
+          <li>Ve a <span class="field">Ajuste de potencia → Control de batería</span>, o bien desde <span class="field">Monitorización de dispositivos</span> selecciona tu inversor → <span class="field">Ajustes</span> → parámetros de control de batería.</li>
+          <li>Activa la opción <span class="field">Cargar desde red</span> (Charge from grid) — sin ella, la batería no podrá cargar en los tramos programados.</li>
+          <li>Define al menos un tramo de <strong>carga</strong> y uno de <strong>descarga</strong> (puedes crear hasta 14 tramos distintos en total).</li>
+          <li>Ejemplo orientativo: carga 00:00–06:00, descarga 06:00–24:00, con un <span class="field">SOC de corte de carga desde red</span> del 50% (para no sobrecargar desde la red más allá de ese punto).</li>
+        </ol>
+        <p class="lead" style="font-size:12.5px;color:var(--muted)">El "SOC de fin de descarga" y el "SOC de reserva/backup" suelen dejarse entre el 10-20% — si están muy altos, la batería parece "no descargar" cuando en realidad ya llegó a su límite de seguridad.</p>
+        <div class="src-label">Fuente oficial</div>
         <div class="links">
-          <a class="off-link" href="https://support.huawei.com/enterprise/en/doc/EDOC1100165054/f8bedcea/scheduled-charging" target="_blank" rel="noopener">📄 Scheduled Charging — FusionSolar App User Manual</a>
+          <a class="off-link" href="https://support.huawei.com/enterprise/en/doc/EDOC1100186676/e8d2e6db/tou-time-of-use-mode" target="_blank" rel="noopener">📄 TOU (Time of Use) Mode — HUAWEI LUNA2000</a>
           <a class="off-link" href="https://support.huawei.com/enterprise/en/doc/EDOC1100182221/e816aff4/battery-parameters" target="_blank" rel="noopener">📄 Battery Parameters — FusionSolar App User Manual</a>
         </div>
       </div></div>
@@ -92,7 +123,16 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <p class="lead">Fronius llama a esta función <strong>"Time-of-Use"</strong> (control de batería por franjas horarias). No todos los inversores domésticos la traen activada de fábrica — si no la ves, consulta con tu instalador. Documentación oficial de Fronius:</p>
+        <p class="lead">Fronius llama a esta función <strong>Time-of-Use</strong> (control de batería por franjas horarias). No todos los inversores domésticos la traen activada de fábrica — si no la ves, consulta con tu instalador.</p>
+        <ol class="steps">
+          <li>Entra en Solar.web con tu cuenta.</li>
+          <li>Ve a <span class="field">Ajustes → Componentes</span>, selecciona tu inversor y pulsa el menú de tres puntos (⋮) → <span class="field">Ajustes del dispositivo → Interfaz web</span>.</li>
+          <li>Dentro, ve a <span class="field">Gestión de energía → Gestión de batería → Ajustes de SOC</span>.</li>
+          <li>Añade un nuevo tramo y márcalo como <span class="field">Descarga forzada / Descarga programada</span> (Forced/Scheduled Discharge) en las horas caras que te indique el plan.</li>
+          <li>Guarda los cambios.</li>
+        </ol>
+        <p class="lead" style="font-size:12.5px;color:var(--muted)">Cuidado con el <span class="field">SOC mínimo</span>: si lo dejas muy alto (40-50%), la batería puede parar de descargar antes de tiempo y perderte parte del tramo programado — bájalo para aprovechar toda la ventana.</p>
+        <div class="src-label">Fuente oficial</div>
         <div class="links">
           <a class="off-link" href="https://www.fronius.com/en/~/downloads/Solar%20Energy/Whitepaper/SE_WP_How_to_set_up_Battery_control_schedule_EN.pdf" target="_blank" rel="noopener">📄 Correctly Setting the Time-of-Use Storage (PDF oficial)</a>
           <a class="off-link" href="https://www.fronius.com/en/~/downloads/Solar%20Energy/Whitepaper/SE_WP_Time_Of_Use_Hybrid_Inverters_EN.pdf" target="_blank" rel="noopener">📄 Time-of-Use Settings with Fronius Hybrid Inverters (PDF oficial)</a>
@@ -107,10 +147,19 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <p class="lead">En Victron se configura como <strong>"Scheduled Charging"</strong> dentro del menú ESS del dispositivo GX, gestionado desde VRM. Documentación oficial de Victron Energy:</p>
+        <p class="lead">En Victron se llama <strong>Scheduled Charging</strong> y vive en el menú ESS del dispositivo GX, gestionado desde VRM.</p>
+        <ol class="steps">
+          <li>Entra en <span class="field">vrm.victronenergy.com</span> con tu cuenta.</li>
+          <li>Ve a tu instalación → configuración del dispositivo GX → <span class="field">ESS</span>.</li>
+          <li>En <span class="field">Scheduled charging</span> (carga programada) puedes definir hasta <strong>5 tramos</strong>.</li>
+          <li>Para cada tramo indica: <span class="field">hora de inicio</span>, <span class="field">duración</span>, y opcionalmente un <span class="field">SOC objetivo</span> (hasta qué % quieres cargar).</li>
+          <li>Guarda — Victron aplica los cambios casi al instante.</li>
+        </ol>
+        <p class="lead" style="font-size:12.5px;color:var(--muted)">Si la batería llega al SOC objetivo antes de que acabe el tramo, deja de cargar pero <strong>no descarga</strong> (salvo corte de red) — se queda a tope sin gastar ciclos de más, dejando hueco para cargar con el sol después.</p>
+        <div class="src-label">Fuente oficial</div>
         <div class="links">
           <a class="off-link" href="https://www.victronenergy.com/live/ess:scheduled_charging" target="_blank" rel="noopener">📄 ESS: Scheduled Charging — Victron Energy</a>
-          <a class="off-link" href="https://www.victronenergy.com/media/pg/VRM_Portal_manual/en/control-your-devices-in-vrm.html" target="_blank" rel="noopener">📄 Control your devices in VRM — VRM Portal Manual</a>
+          <a class="off-link" href="https://www.victronenergy.com/upload/documents/Energy_Storage_System/6292-ESS_design_and_installation_manual-pdf-en.pdf" target="_blank" rel="noopener">📄 ESS Design and Installation Manual (PDF oficial, Rev 11)</a>
         </div>
       </div></div>
     </div>
