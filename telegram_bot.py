@@ -637,6 +637,21 @@ async def daily_plan(users):
             log.info(f"Plan de mañana enviado a {chat_id} (hora configurada: {now_hour}:00)")
         except Exception as e:
             log.error(f"Error plan diario {chat_id}: {e}")
+            # No lo dejamos sin avisar: sin esto, el usuario simplemente no recibe
+            # su mensaje del día y no sabe si el bot sigue vivo. Se marca como
+            # "intentado hoy" para no reintentar en bucle cada hora contra una
+            # fuente caída, pero se le invita a pedirlo a mano cuando quiera.
+            u["plan_date"] = tomorrow_str
+            save_users(users)
+            try:
+                await send_message(
+                    chat_id,
+                    "⚠️ Hoy no he podido calcular tu plan de mañana automáticamente "
+                    "(fallo temporal en los datos de precio o previsión solar). "
+                    "Prueba con /plan manana en un rato — si ya está disponible, te lo doy al momento.",
+                )
+            except Exception:
+                log.error(f"No se pudo avisar del fallo a {chat_id}")
 
 
 # ── Main loop ──

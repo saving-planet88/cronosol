@@ -261,7 +261,12 @@ async function fetchPlan(lat,lon,kwp,bat,daily,dateStr,tilt,azimuth) {
   });
   if(!r.ok) {
     const err = await r.json().catch(()=>({detail:'Error desconocido'}));
-    throw new Error(err.detail || `HTTP ${r.status}`);
+    let msg = err.detail;
+    if (Array.isArray(msg)) {
+      // Errores de validación de FastAPI (422): lista de objetos {loc, msg, ...}
+      msg = msg.map(m => m.msg || JSON.stringify(m)).join('. ');
+    }
+    throw new Error(msg || `HTTP ${r.status}`);
   }
   return r.json();
 }
@@ -283,7 +288,9 @@ async function run() {
   const daily=+document.getElementById('cons').value;
   const dateStr=document.getElementById('fecha').value;
   const locName=document.getElementById('loc-name').textContent;
-  const tilt=+document.getElementById('tilt').value;
+  const tiltInput=document.getElementById('tilt');
+  const tilt=Math.min(90, Math.max(0, +tiltInput.value || 0));
+  tiltInput.value = tilt; // refleja el ajuste si el usuario había escrito algo fuera de rango
   const azimuth=+document.getElementById('azimuth').value;
 
   let api;
