@@ -1,21 +1,31 @@
 """
-SolOptim — Bot de Telegram (Fase 1.5)
-Envia alertas horarias al usuario cuando cambia la accion recomendada.
+CronoSolar — Bot de Telegram (Fase 1.5)
+
+Mecánica de alertas (revisada jul 2026):
+- Mensaje automático UNA vez al día, por la TARDE (no por la mañana),
+  con el plan de MAÑANA — así hay tiempo de sobra para programar el
+  inversor con calma la noche antes. ESIOS publica los precios D+1
+  sobre las 14h, así que el envío se hace después de esa hora.
+- Sin alertas horarias por defecto: si ya programaste tu inversor con
+  las franjas del día, el propio inversor ejecuta el plan — un aviso
+  cada vez que cambia la acción sería ruido redundante. Queda como
+  opción manual (/avisos on) solo para quien no pueda programar su
+  inversor y necesite que se lo recuerden en tiempo real.
+- /plan a mano, a media tarde/noche del día en curso, muestra el resto
+  del día (no los tramos ya pasados) y, si ya ha pasado la hora en que
+  ESIOS publica el día siguiente, sugiere directamente /plan manana.
 
 Flujo conversacional: /start guia al usuario paso a paso (ubicacion —
-compartida o escrita — kWp, bateria, consumo) sin exigir sintaxis de
-comandos exacta. El bot delega todo el calculo (precios ESIOS + solar
-Open-Meteo + optimizacion) a la API interna de la web, para que los
-numeros que ve el usuario en Telegram y en el informe web coincidan
-siempre.
+compartida o escrita — kWp, bateria, consumo, inversor) sin exigir
+sintaxis de comandos exacta. El bot delega todo el calculo (precios
+ESIOS + solar Open-Meteo + optimizacion) a la API interna de la web,
+para que los numeros que ve el usuario en Telegram y en el informe web
+coincidan siempre.
 
 Uso:
   1. Crea un bot en Telegram hablando con @BotFather -> te da un TOKEN
   2. Anade TELEGRAM_BOT_TOKEN al .env
   3. Ejecuta: python telegram_bot.py
-  4. El usuario habla con el bot, manda /start y sigue los pasos
-  5. Cada manana recibe el plan del dia, y durante el dia recibe alertas
-     solo cuando cambia la accion recomendada
 """
 
 import asyncio
@@ -23,7 +33,7 @@ import json
 import os
 import re
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import httpx
 from dotenv import load_dotenv
@@ -36,9 +46,10 @@ API_INTERNAL_URL = os.getenv("API_INTERNAL_URL", "http://localhost:8000")  # bac
 WEB_PUBLIC_URL = os.getenv("WEB_PUBLIC_URL", "http://localhost:8000")  # para los enlaces que ve el usuario
 
 ES_GRID_CO2_KG_PER_KWH = 0.19  # factor medio orientativo de la red española
+DAILY_SEND_HOUR = 16  # ESIOS publica D+1 sobre las 14h; enviamos con margen
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
-log = logging.getLogger("soloptim")
+log = logging.getLogger("cronosolar")
 
 # ── Persistencia de usuarios ──
 
@@ -136,27 +147,34 @@ ACTION_MSG = {
     "grid": "Comprando de red — sin sol ({price:.0f} €/MWh)",
 }
 
-
 KM_PER_KG_CO2 = 1 / 0.13  # equivalencia orientativa: ~0.13 kg CO2 por km en coche de gasolina medio
 
-def format_plan_message(plan: dict, u: dict, target_date: date, intro: str = "☀️ *Plan de hoy*") -> str:
+
+def format_plan_message(plan: dict, u: dict, target_date: date, intro: str, hour_from: int = 0) -> str:
+    """hour_from > 0 se usa para mostrar solo el resto del día (tramos ya pasados omitidos)."""
     co2 = plan["total_solar_self_consumed_kwh"] * ES_GRID_CO2_KG_PER_KWH
     km_equiv = co2 * KM_PER_KG_CO2
     lines = [
         f"{intro} — {target_date}",
         f"📍 {u.get('location', '?')} | {u['kwp']} kWp | {u['battery']} kWh batería",
         "",
-        f"💶 *{plan['total_savings_eur']:.2f} € de ahorro estimado*",
+        f"💶 *{plan['total_savings_eur']:.2f} € de ahorro estimado (día completo)*",
         f"🌍 ~{co2:.1f} kg CO₂ evitados — como no coger el coche {km_equiv:.0f} km (estimado)",
         "",
     ]
     prev_action = None
+    shown = 0
     for h in plan["hours"]:
+        if h["hour"] < hour_from:
+            continue
         if h["action"] != prev_action:
             emoji = ACTION_EMOJI.get(h["action"], "•")
             msg = ACTION_MSG.get(h["action"], h["action"]).format(price=h["price_eur_mwh"])
             lines.append(f"`{h['hour']:02d}:00` {emoji} {msg}")
             prev_action = h["action"]
+            shown += 1
+    if shown == 0:
+        lines.append("_El día ya ha terminado — no quedan tramos por delante._")
     lines.append("")
     lines.append(f"📊 [Ver informe completo con gráficos]({report_link(u, target_date)})")
     inv = u.get("inverter")
@@ -232,7 +250,9 @@ def default_user():
         "kwp": 5, "battery": 10, "consumption": 12,
         "lat": 41.61, "lon": 2.29, "location": "Granollers",
         "inverter": None,
-        "last_action": None, "awaiting": "location",
+        "hourly_alerts": False,       # opt-in: solo para quien no puede programar su inversor
+        "plan": None, "plan_date": None, "last_action": None,
+        "awaiting": "location",
     }
 
 
@@ -254,10 +274,12 @@ async def advance_step(chat_id, u, users, current_step):
     else:
         u["awaiting"] = None
         save_users(users)
-        await send_plan(chat_id, u, users, intro="✅ *Todo listo — tu plan de hoy*")
+        await send_today_plan(chat_id, u, users, intro="✅ *Todo listo — así queda hoy*")
 
 
-async def send_plan(chat_id, u, users, intro="☀️ *Plan de hoy*"):
+async def send_today_plan(chat_id, u, users, intro=None):
+    """/plan a mano: el resto de HOY (tramos ya pasados fuera), con empujón a manana si toca."""
+    now = datetime.now()
     await send_message(chat_id, "Calculando plan con datos reales...")
     try:
         plan = await fetch_plan(u, date.today())
@@ -265,10 +287,29 @@ async def send_plan(chat_id, u, users, intro="☀️ *Plan de hoy*"):
         log.error(f"Error calculando plan para {chat_id}: {e}")
         await send_message(chat_id, "No he podido calcular el plan ahora mismo. Prueba de nuevo en un minuto con /plan.")
         return
-    u["today_plan"] = plan
+    # Solo refrescamos el plan usado para avisos horarios si es el de hoy
+    u["plan"] = plan
+    u["plan_date"] = str(date.today())
     u["last_action"] = None
     save_users(users)
-    await send_message(chat_id, format_plan_message(plan, u, date.today(), intro))
+    if intro is None:
+        intro = "☀️ *Lo que queda de hoy*" if now.hour > 0 else "☀️ *Plan de hoy*"
+    msg = format_plan_message(plan, u, date.today(), intro, hour_from=now.hour)
+    if now.hour >= 14:
+        msg += "\n\n💡 Ya está publicado el precio de mañana — mira también /plan manana y déjalo programado esta noche."
+    await send_message(chat_id, msg)
+
+
+async def send_tomorrow_plan(chat_id, u, users):
+    tomorrow = date.today() + timedelta(days=1)
+    await send_message(chat_id, "Calculando el plan de mañana...")
+    try:
+        plan = await fetch_plan(u, tomorrow)
+    except Exception as e:
+        log.error(f"Error calculando plan de mañana para {chat_id}: {e}")
+        await send_message(chat_id, "No he podido calcular el plan de mañana — puede que ESIOS aún no lo haya publicado (suele estar sobre las 14h). Prueba en un rato.")
+        return
+    await send_message(chat_id, format_plan_message(plan, u, tomorrow, "🌙 *Plan de mañana*"))
 
 
 # ── Comando handler ──
@@ -301,6 +342,9 @@ async def handle_message(msg, users):
             "☀️ *CronoSolar* — Optimiza tu autoconsumo solar\n\n"
             "Te hago 5 preguntas rápidas y ya está. Puedes saltarte cualquiera "
             "escribiendo /plan para usar valores por defecto.\n\n"
+            "Cada tarde (sobre las 16:00, cuando ya se conoce el precio de mañana) "
+            "te mando el plan del día siguiente para que programes tu inversor con "
+            "calma y te olvides. Sin avisos cada hora — para eso está el propio inversor.\n\n"
             "Primero: ¿dónde está tu instalación? Comparte tu ubicación o "
             "escribe el nombre de tu localidad.",
             reply_markup=LOCATION_KEYBOARD,
@@ -363,20 +407,48 @@ async def handle_message(msg, users):
         await send_message(chat_id, f"🔌 Inversor: {INVERTER_LABELS[inv]}")
         return
 
+    if text.startswith("/avisos"):
+        parts = text.split(maxsplit=1)
+        arg = parts[1].strip().lower() if len(parts) > 1 else None
+        if arg in ("on", "activar", "si", "sí"):
+            u["hourly_alerts"] = True
+            save_users(users)
+            await send_message(chat_id, "🔔 Avisos horarios *activados*. Te avisaré cada vez que cambie la acción recomendada, además del plan diario de la tarde.")
+        elif arg in ("off", "desactivar", "no"):
+            u["hourly_alerts"] = False
+            save_users(users)
+            await send_message(chat_id, "🔕 Avisos horarios *desactivados*. Seguirás recibiendo el plan cada tarde para programar tu inversor.")
+        else:
+            estado = "activados" if u.get("hourly_alerts") else "desactivados"
+            await send_message(
+                chat_id,
+                f"Los avisos horarios están *{estado}*.\n\n"
+                "Si puedes programar franjas horarias en tu inversor (ver /tutoriales), no los necesitas — el plan de la tarde es suficiente. "
+                "Si tu inversor no permite programación y necesitas que te avisen en tiempo real cada vez que toca cambiar de acción, actívalos con /avisos on."
+            )
+        return
+
     if text.startswith("/plan"):
+        parts = text.split(maxsplit=1)
+        arg = parts[1].strip().lower() if len(parts) > 1 else ""
         u["awaiting"] = None
         save_users(users)
-        await send_plan(chat_id, u, users)
+        if arg in ("manana", "mañana", "tomorrow"):
+            await send_tomorrow_plan(chat_id, u, users)
+        else:
+            await send_today_plan(chat_id, u, users)
         return
 
     if text.startswith("/config"):
+        avisos = "on" if u.get("hourly_alerts") else "off"
         await send_message(
             chat_id,
             f"📍 {u.get('location', '?')} ({u['lat']}, {u['lon']})\n"
             f"☀️ Paneles: {u['kwp']} kWp\n"
             f"🔋 Batería: {u['battery']} kWh\n"
             f"⚡ Consumo: {u['consumption']} kWh/día\n"
-            f"🔌 Inversor: {INVERTER_LABELS.get(u.get('inverter'), 'no indicado')}"
+            f"🔌 Inversor: {INVERTER_LABELS.get(u.get('inverter'), 'no indicado')}\n"
+            f"🔔 Avisos horarios: {avisos} (/avisos on|off)"
         )
         return
 
@@ -410,18 +482,21 @@ async def handle_message(msg, users):
         await advance_step(chat_id, u, users, "inverter")
         return
 
-    await send_message(chat_id, "No te he entendido. Escribe /plan para ver tu plan de hoy, o /start para reconfigurar.")
+    await send_message(chat_id, "No te he entendido. Escribe /plan para ver lo que queda de hoy, /plan manana para el de mañana, o /start para reconfigurar.")
 
 
-# ── Scheduler: alerta cuando cambia la accion ──
+# ── Scheduler: alerta cuando cambia la accion (solo opt-in, /avisos on) ──
 
 async def check_and_alert(users):
-    """Ejecutar cada hora. Compara la accion actual con la anterior y alerta si cambia."""
+    """Ejecutar cada hora. Solo para usuarios con hourly_alerts activado."""
     current_hour = datetime.now().hour
+    today_str = str(date.today())
 
     for chat_id, u in users.items():
-        plan = u.get("today_plan")
-        if not plan or not isinstance(plan, dict) or u.get("awaiting"):
+        if not u.get("hourly_alerts") or u.get("awaiting"):
+            continue
+        plan = u.get("plan")
+        if not plan or not isinstance(plan, dict) or u.get("plan_date") != today_str:
             continue
 
         hours = plan.get("hours", [])
@@ -441,17 +516,20 @@ async def check_and_alert(users):
 
 
 async def daily_plan(users):
-    """Ejecutar cada manana (~8:00). Calcula y envia el plan del dia."""
+    """Ejecutar una vez cada tarde (~16:00). Calcula y envia el plan de MANANA."""
+    tomorrow = date.today() + timedelta(days=1)
     for chat_id, u in list(users.items()):
         if u.get("awaiting"):
             continue
         try:
-            plan = await fetch_plan(u, date.today())
-            u["today_plan"] = plan
+            plan = await fetch_plan(u, tomorrow)
+            # Se guarda como el plan "activo" — cuando llegue manana, ya sera "hoy"
+            u["plan"] = plan
+            u["plan_date"] = str(tomorrow)
             u["last_action"] = None
             save_users(users)
-            await send_message(chat_id, format_plan_message(plan, u, date.today()))
-            log.info(f"Plan diario enviado a {chat_id}")
+            await send_message(chat_id, format_plan_message(plan, u, tomorrow, "🌙 *Plan de mañana* — prográmalo esta noche y olvídate"))
+            log.info(f"Plan de mañana enviado a {chat_id}")
         except Exception as e:
             log.error(f"Error plan diario {chat_id}: {e}")
 
@@ -471,15 +549,15 @@ async def main():
     last_alert_hour = -1
     plan_sent_today = False
 
-    log.info("SolOptim Telegram bot iniciado")
+    log.info("CronoSolar Telegram bot iniciado")
 
     while True:
         try:
             now = datetime.now()
-            if now.hour == 8 and not plan_sent_today:
+            if now.hour == DAILY_SEND_HOUR and not plan_sent_today:
                 await daily_plan(users)
                 plan_sent_today = True
-            if now.hour != 8:
+            if now.hour != DAILY_SEND_HOUR:
                 plan_sent_today = False
 
             if now.hour != last_alert_hour:
