@@ -39,6 +39,10 @@ th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;
 .cta h2{color:#fff;margin-top:0}
 .cta p{color:#eef6d8}
 .cta a{display:inline-block;background:#fff;color:var(--forest);padding:14px 30px;border-radius:999px;font-weight:700;margin-top:18px}
+.hero-photo{width:100%;height:clamp(220px,38vw,380px);object-fit:cover;display:block}
+.hero-photo-wrap{position:relative;margin-top:-1px}
+.hero-photo-credit{position:absolute;bottom:10px;right:14px;font-size:10.5px;color:rgba(255,255,255,.85);background:rgba(14,61,44,.55);padding:3px 9px;border-radius:999px;font-family:var(--mono)}
+.inline-photo{width:100%;border-radius:16px;margin:24px 0;display:block;object-fit:cover;height:clamp(180px,30vw,280px)}
 @media(max-width:600px){.stats{grid-template-columns:1fr}}
 </style>
 </head>
@@ -46,7 +50,12 @@ th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;
 
 {% include "_nav.html" %}
 
-<div class="wrap" style="padding:70px 0 20px">
+<div class="hero-photo-wrap">
+  <img class="hero-photo" src="/static/assets/impacto/hero.webp" alt="Placas solares en tejados de viviendas, cielo despejado"/>
+  <span class="hero-photo-credit">Foto: Pexels</span>
+</div>
+
+<div class="wrap" style="padding:44px 0 20px">
   <div class="eyebrow">Informe de impacto</div>
   <h1>El ahorro y el clima son la misma cuenta.</h1>
   <p class="lead">Cada kWh que cargas en tu batería o consumes directamente del sol en vez de la red es un kWh que no viene de una central de gas o carbón. CronoSolar existe para que esa decisión sea automática: te dice cuándo mover tu consumo, y aquí explicamos por qué eso importa y cómo lo medimos.</p>
@@ -67,6 +76,7 @@ th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;
   <p>Esto significa que optimizar tu consumo por precio — que es lo que hace la calculadora — normalmente también lo optimiza por emisiones, sin que tengas que pensarlo. La diferencia añadida de tener paneles y batería es que puedes desplazar ese consumo a horas de generación solar <em>tuya</em>, que tiene emisión cero en el punto de uso.</p>
 
   <h2>Cómo calculamos el CO₂ evitado</h2>
+  <img class="inline-photo" src="/static/assets/impacto/metodologia.webp" alt="Detalle de paneles solares instalados sobre tejado de tejas"/>
   <div class="box">
     <p><b>kWh autoconsumidos de origen solar × factor de emisión medio de la red española</b></p>
     <p style="margin-top:10px">Usamos un factor de referencia de <strong>0,19 kg CO₂/kWh</strong>, en línea con el factor de emisión medio del mix eléctrico peninsular publicado por Red Eléctrica (REE) en los últimos años — varía de un año a otro según cuánta hidráulica, eólica y nuclear haya disponible, así que lo tratamos como una cifra orientativa, no un valor certificado por instalación.</p>
@@ -74,6 +84,7 @@ th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;
   <p class="src">Metodología del factor de emisión: <a href="https://www.ree.es/es/datos/generacion/no-renovables-detalle-emisiones-CO2" target="_blank" rel="noopener">Red Eléctrica de España — Emisiones de CO₂ asociadas a la generación eléctrica</a></p>
 
   <h2>Lo que significan 340 kg al año</h2>
+  <img class="inline-photo" src="/static/assets/impacto/equivalencias.webp" alt="Tejado con placas solares junto a árboles"/>
   <div class="chips">
     <div class="chip">🚗 ≈ 2.600 km sin coger el coche (turismo medio, ~130 g CO₂/km)</div>
     <div class="chip">🌳 ≈ 15 árboles creciendo durante un año (absorción media ~22 kg CO₂/árbol/año)</div>

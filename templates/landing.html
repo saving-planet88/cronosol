@@ -56,7 +56,7 @@ a:hover{color:var(--green)}
 
   <div id="hero" style="position:relative;overflow:hidden;margin-top:-80px;padding-top:80px;min-height:clamp(580px,88vh,820px);display:flex;align-items:center;background-image:linear-gradient(90deg,rgba(233,239,176,.97) 0%,rgba(233,239,176,.72) 36%,rgba(233,239,176,0) 62%),url('/static/assets/hero-sm.webp');background-size:cover;background-position:center">
     <div style="width:100%;max-width:1180px;margin:0 auto;padding:0 26px">
-    <div style="max-width:640px">
+    <div id="hero-content" style="max-width:640px;transition:transform .1s linear">
       <div class="fadeup" style="display:inline-flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--bdr);border-radius:999px;padding:7px 15px;font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:22px;font-weight:600">☀ Precio + sol, hora a hora · Gratis</div>
       <h1 class="fadeup" style="animation-delay:.12s;font-size:clamp(42px,6vw,74px);font-weight:300;letter-spacing:-2.4px;line-height:1.0;margin-bottom:22px;text-wrap:balance">Vive al ritmo <span style="font-weight:800;background:var(--green);-webkit-background-clip:text;background-clip:text;color:transparent">del sol</span>,<br><span style="font-weight:800">no del contador.</span></h1>
       <p class="fadeup" style="animation-delay:.24s;font-size:17.5px;color:var(--muted);max-width:470px;margin-bottom:14px;text-wrap:pretty">CronoSolar cruza el precio real del mercado eléctrico con la previsión de tu producción solar, y te dice hora a hora cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes.</p>
@@ -312,10 +312,16 @@ function initAnims() {
   document.querySelectorAll('[data-count]').forEach((el) => cio.observe(el));
 
   const hero = document.getElementById('hero');
+  const heroContent = document.getElementById('hero-content');
   const topbar = document.getElementById('topbar');
   const onScroll = () => {
     const y = window.scrollY || 0;
-    if (hero && y < 900) hero.style.backgroundPositionY = (50 + y * 0.04) + '%';
+    if (hero && y < 900) {
+      // Parallax: el fondo se desplaza más despacio que el scroll (efecto de profundidad),
+      // el texto en primer plano un poco más rápido — capas a distinta velocidad.
+      hero.style.backgroundPositionY = (50 + y * 0.12) + '%';
+      if (heroContent) heroContent.style.transform = `translateY(${y * 0.18}px)`;
+    }
     if (topbar) topbar.classList.toggle('scrolled', y > 30);
   };
   window.addEventListener('scroll', onScroll, { passive: true });

@@ -50,12 +50,15 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
 .tou-legend span{display:inline-flex;align-items:center;gap:5px}
 .tou-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
 
-.carousel{margin:0 auto 20px;max-width:280px}
-.carousel-track{position:relative;border-radius:16px;overflow:hidden}
-.carousel-track img{width:100%}
-.carousel-track img.carousel-slide{display:none}
-.carousel-track img.carousel-slide.active{display:block}
-.carousel-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px}
+.carousel{margin:0 auto 22px;max-width:320px}
+.carousel-step{display:none}
+.carousel-step.active{display:block}
+.carousel-img{width:100%;max-width:280px;display:block;margin:0 auto;border-radius:16px}
+.carousel-caption{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink);line-height:1.55;margin-top:14px;padding:0 4px}
+.carousel-caption .step-num{flex-shrink:0;width:22px;height:22px;border-radius:7px;background:var(--green);color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.carousel-caption-only{background:var(--lemon-lite);border-radius:16px;padding:34px 22px;text-align:left;margin-top:0}
+.carousel-caption-only .step-num{background:var(--forest)}
+.carousel-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px}
 .carousel-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--bdr);background:#fff;color:var(--ink);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .carousel-btn:hover{border-color:var(--green);color:var(--green)}
 .carousel-dots{display:flex;gap:6px}
@@ -101,13 +104,27 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
+        <p class="lead">En Huawei/LUNA2000 la función se llama <strong>modo TOU (Time of Use)</strong>: programas manualmente los tramos en los que la batería carga y descarga. Un uso típico: dejar que la red cargue la batería de madrugada (barata) y descargarla en las horas caras del día.</p>
         <div class="carousel" data-carousel>
-          <div class="carousel-track">
-            <img class="carousel-slide active" src="/static/assets/tutoriales/steps/huawei-1.svg" alt="Paso 1: iniciar sesión en FusionSolar (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/huawei-2.svg" alt="Paso 2: navegar a Ajuste de potencia → Control de batería (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/huawei-3.svg" alt="Paso 3: activar Cargar desde red (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/huawei-4.svg" alt="Paso 4: definir tramos de carga y descarga (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/huawei-5.svg" alt="Paso 5: guardar ajustes (ilustración propia, no captura real)"/>
+          <div class="carousel-step active" data-step="1">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/huawei-1.svg" alt="Paso 1: iniciar sesión en FusionSolar (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">1</span><span class="caption-text"> Abre la app FusionSolar e inicia sesión (como instalador si tienes ese acceso, o como propietario).</span></p>
+          </div>
+          <div class="carousel-step" data-step="2">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/huawei-2.svg" alt="Paso 2: navegar a Ajuste de potencia → Control de batería (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">2</span><span class="caption-text"> Ve a <span class="field">Ajuste de potencia → Control de batería</span>, o bien desde <span class="field">Monitorización de dispositivos</span> selecciona tu inversor → <span class="field">Ajustes</span> → parámetros de control de batería.</span></p>
+          </div>
+          <div class="carousel-step" data-step="3">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/huawei-3.svg" alt="Paso 3: activar Cargar desde red (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">3</span><span class="caption-text"> Activa la opción <span class="field">Cargar desde red</span> (Charge from grid) — sin ella, la batería no podrá cargar en los tramos programados.</span></p>
+          </div>
+          <div class="carousel-step" data-step="4">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/huawei-4.svg" alt="Paso 4: definir tramos de carga y descarga (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">4</span><span class="caption-text"> Define al menos un tramo de <strong>carga</strong> y uno de <strong>descarga</strong> (puedes crear hasta 14 tramos distintos en total).</span></p>
+          </div>
+          <div class="carousel-step" data-step="5">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/huawei-5.svg" alt="Paso 5: guardar ajustes (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">5</span><span class="caption-text"> Ejemplo orientativo: carga 00:00–06:00, descarga 06:00–24:00, con un <span class="field">SOC de corte de carga desde red</span> del 50% (para no sobrecargar desde la red más allá de ese punto).</span></p>
           </div>
           <div class="carousel-nav">
             <button class="carousel-btn" data-prev aria-label="Paso anterior">‹</button>
@@ -115,14 +132,6 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
             <button class="carousel-btn" data-next aria-label="Paso siguiente">›</button>
           </div>
         </div>
-        <p class="lead">En Huawei/LUNA2000 la función se llama <strong>modo TOU (Time of Use)</strong>: programas manualmente los tramos en los que la batería carga y descarga. Un uso típico: dejar que la red cargue la batería de madrugada (barata) y descargarla en las horas caras del día.</p>
-        <ol class="steps">
-          <li>Abre la app FusionSolar e inicia sesión (como instalador si tienes ese acceso, o como propietario).</li>
-          <li>Ve a <span class="field">Ajuste de potencia → Control de batería</span>, o bien desde <span class="field">Monitorización de dispositivos</span> selecciona tu inversor → <span class="field">Ajustes</span> → parámetros de control de batería.</li>
-          <li>Activa la opción <span class="field">Cargar desde red</span> (Charge from grid) — sin ella, la batería no podrá cargar en los tramos programados.</li>
-          <li>Define al menos un tramo de <strong>carga</strong> y uno de <strong>descarga</strong> (puedes crear hasta 14 tramos distintos en total).</li>
-          <li>Ejemplo orientativo: carga 00:00–06:00, descarga 06:00–24:00, con un <span class="field">SOC de corte de carga desde red</span> del 50% (para no sobrecargar desde la red más allá de ese punto).</li>
-        </ol>
         <p class="lead" style="font-size:12.5px;color:var(--muted)">El "SOC de fin de descarga" y el "SOC de reserva/backup" suelen dejarse entre el 10-20% — si están muy altos, la batería parece "no descargar" cuando en realidad ya llegó a su límite de seguridad.</p>
         <div class="src-label">Fuente oficial</div>
         <div class="links">
@@ -139,13 +148,27 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
+        <p class="lead">Fronius llama a esta función <strong>Time-of-Use</strong> (control de batería por franjas horarias). No todos los inversores domésticos la traen activada de fábrica — si no la ves, consulta con tu instalador.</p>
         <div class="carousel" data-carousel>
-          <div class="carousel-track">
-            <img class="carousel-slide active" src="/static/assets/tutoriales/steps/fronius-1.svg" alt="Paso 1: iniciar sesión en Solar.web (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/fronius-2.svg" alt="Paso 2: navegar a Ajustes → Componentes → Interfaz web (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/fronius-3.svg" alt="Paso 3: revisar el SOC mínimo (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/fronius-4.svg" alt="Paso 4: añadir un tramo de descarga forzada (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/fronius-5.svg" alt="Paso 5: guardar los cambios (ilustración propia, no captura real)"/>
+          <div class="carousel-step active" data-step="1">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/fronius-1.svg" alt="Paso 1: iniciar sesión en Solar.web (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">1</span><span class="caption-text"> Entra en Solar.web con tu cuenta.</span></p>
+          </div>
+          <div class="carousel-step" data-step="2">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/fronius-2.svg" alt="Paso 2: navegar a Ajustes → Componentes → Interfaz web (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">2</span><span class="caption-text"> Ve a <span class="field">Ajustes → Componentes</span>, selecciona tu inversor y pulsa el menú de tres puntos (⋮) → <span class="field">Ajustes del dispositivo → Interfaz web</span>.</span></p>
+          </div>
+          <div class="carousel-step" data-step="3">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/fronius-3.svg" alt="Paso 3: revisar el SOC mínimo (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">3</span><span class="caption-text"> Dentro, ve a <span class="field">Gestión de energía → Gestión de batería → Ajustes de SOC</span>.</span></p>
+          </div>
+          <div class="carousel-step" data-step="4">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/fronius-4.svg" alt="Paso 4: añadir un tramo de descarga forzada (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">4</span><span class="caption-text"> Añade un nuevo tramo y márcalo como <span class="field">Descarga forzada / Descarga programada</span> (Forced/Scheduled Discharge) en las horas caras que te indique el plan.</span></p>
+          </div>
+          <div class="carousel-step" data-step="5">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/fronius-5.svg" alt="Paso 5: guardar los cambios (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">5</span><span class="caption-text"> Guarda los cambios.</span></p>
           </div>
           <div class="carousel-nav">
             <button class="carousel-btn" data-prev aria-label="Paso anterior">‹</button>
@@ -153,14 +176,6 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
             <button class="carousel-btn" data-next aria-label="Paso siguiente">›</button>
           </div>
         </div>
-        <p class="lead">Fronius llama a esta función <strong>Time-of-Use</strong> (control de batería por franjas horarias). No todos los inversores domésticos la traen activada de fábrica — si no la ves, consulta con tu instalador.</p>
-        <ol class="steps">
-          <li>Entra en Solar.web con tu cuenta.</li>
-          <li>Ve a <span class="field">Ajustes → Componentes</span>, selecciona tu inversor y pulsa el menú de tres puntos (⋮) → <span class="field">Ajustes del dispositivo → Interfaz web</span>.</li>
-          <li>Dentro, ve a <span class="field">Gestión de energía → Gestión de batería → Ajustes de SOC</span>.</li>
-          <li>Añade un nuevo tramo y márcalo como <span class="field">Descarga forzada / Descarga programada</span> (Forced/Scheduled Discharge) en las horas caras que te indique el plan.</li>
-          <li>Guarda los cambios.</li>
-        </ol>
         <p class="lead" style="font-size:12.5px;color:var(--muted)">Cuidado con el <span class="field">SOC mínimo</span>: si lo dejas muy alto (40-50%), la batería puede parar de descargar antes de tiempo y perderte parte del tramo programado — bájalo para aprovechar toda la ventana.</p>
         <div class="src-label">Fuente oficial <span style="text-transform:none;font-weight:400">— solo disponible en inglés/alemán, Fronius no publica esta guía en español</span></div>
         <div class="links">
@@ -177,13 +192,27 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
+        <p class="lead">En Victron se llama <strong>Scheduled Charging</strong> y vive en el menú ESS del dispositivo GX, gestionado desde VRM.</p>
         <div class="carousel" data-carousel>
-          <div class="carousel-track">
-            <img class="carousel-slide active" src="/static/assets/tutoriales/steps/victron-1.svg" alt="Paso 1: iniciar sesión en el VRM Portal (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/victron-2.svg" alt="Paso 2: navegar a la configuración del dispositivo GX → ESS (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/victron-3.svg" alt="Paso 3: ver los tramos de carga programada (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/victron-4.svg" alt="Paso 4: editar el SOC objetivo de un tramo (ilustración propia, no captura real)"/>
-            <img class="carousel-slide" src="/static/assets/tutoriales/steps/victron-5.svg" alt="Paso 5: aplicar los cambios (ilustración propia, no captura real)"/>
+          <div class="carousel-step active" data-step="1">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/victron-1.svg" alt="Paso 1: iniciar sesión en el VRM Portal (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">1</span><span class="caption-text"> Entra en <span class="field">vrm.victronenergy.com</span> con tu cuenta.</span></p>
+          </div>
+          <div class="carousel-step" data-step="2">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/victron-2.svg" alt="Paso 2: navegar a la configuración del dispositivo GX → ESS (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">2</span><span class="caption-text"> Ve a tu instalación → configuración del dispositivo GX → <span class="field">ESS</span>.</span></p>
+          </div>
+          <div class="carousel-step" data-step="3">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/victron-3.svg" alt="Paso 3: ver los tramos de carga programada (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">3</span><span class="caption-text"> En <span class="field">Scheduled charging</span> (carga programada) puedes definir hasta <strong>5 tramos</strong>.</span></p>
+          </div>
+          <div class="carousel-step" data-step="4">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/victron-4.svg" alt="Paso 4: editar el SOC objetivo de un tramo (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">4</span><span class="caption-text"> Para cada tramo indica: <span class="field">hora de inicio</span>, <span class="field">duración</span>, y opcionalmente un <span class="field">SOC objetivo</span> (hasta qué % quieres cargar).</span></p>
+          </div>
+          <div class="carousel-step" data-step="5">
+            <img class="carousel-img" src="/static/assets/tutoriales/steps/victron-5.svg" alt="Paso 5: aplicar los cambios (ilustración propia, no captura real)"/>
+            <p class="carousel-caption"><span class="step-num">5</span><span class="caption-text"> Guarda — Victron aplica los cambios casi al instante.</span></p>
           </div>
           <div class="carousel-nav">
             <button class="carousel-btn" data-prev aria-label="Paso anterior">‹</button>
@@ -191,14 +220,6 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
             <button class="carousel-btn" data-next aria-label="Paso siguiente">›</button>
           </div>
         </div>
-        <p class="lead">En Victron se llama <strong>Scheduled Charging</strong> y vive en el menú ESS del dispositivo GX, gestionado desde VRM.</p>
-        <ol class="steps">
-          <li>Entra en <span class="field">vrm.victronenergy.com</span> con tu cuenta.</li>
-          <li>Ve a tu instalación → configuración del dispositivo GX → <span class="field">ESS</span>.</li>
-          <li>En <span class="field">Scheduled charging</span> (carga programada) puedes definir hasta <strong>5 tramos</strong>.</li>
-          <li>Para cada tramo indica: <span class="field">hora de inicio</span>, <span class="field">duración</span>, y opcionalmente un <span class="field">SOC objetivo</span> (hasta qué % quieres cargar).</li>
-          <li>Guarda — Victron aplica los cambios casi al instante.</li>
-        </ol>
         <p class="lead" style="font-size:12.5px;color:var(--muted)">Si la batería llega al SOC objetivo antes de que acabe el tramo, deja de cargar pero <strong>no descarga</strong> (salvo corte de red) — se queda a tope sin gastar ciclos de más, dejando hueco para cargar con el sol después.</p>
         <div class="src-label">Fuente oficial <span style="text-transform:none;font-weight:400">— solo disponible en inglés, Victron no publica esta guía en español</span></div>
         <div class="links">
@@ -237,12 +258,14 @@ function toggle(id) {
   document.getElementById(id).classList.toggle('open');
 }
 
-// Carrusel de pasos (ilustraciones propias) — sin librerías
+// Carrusel de pasos (ilustraciones propias + su instrucción, sincronizados) — sin librerías
 document.querySelectorAll('[data-carousel]').forEach(car => {
-  const slides = [...car.querySelectorAll('.carousel-slide')];
+  const steps = [...car.querySelectorAll('.carousel-step')];
+  // Si un paso no trae <img>, el texto ocupa el hueco de la imagen
+  steps.forEach(s => { if (!s.querySelector('.carousel-img')) s.querySelector('.carousel-caption').classList.add('carousel-caption-only'); });
   const dotsBox = car.querySelector('.carousel-dots');
   let i = 0;
-  slides.forEach((_, idx) => {
+  steps.forEach((_, idx) => {
     const dot = document.createElement('button');
     dot.className = 'carousel-dot' + (idx === 0 ? ' active' : '');
     dot.setAttribute('aria-label', `Ir al paso ${idx + 1}`);
@@ -251,8 +274,8 @@ document.querySelectorAll('[data-carousel]').forEach(car => {
   });
   const dots = [...dotsBox.children];
   function show(n) {
-    i = (n + slides.length) % slides.length;
-    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    i = (n + steps.length) % steps.length;
+    steps.forEach((s, idx) => s.classList.toggle('active', idx === i));
     dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
   }
   car.querySelector('[data-prev]').addEventListener('click', () => show(i - 1));
