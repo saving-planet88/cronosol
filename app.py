@@ -5,9 +5,11 @@ calcula el plan óptimo de carga/descarga y estima el ahorro.
 """
 
 import json
+import math
 import os
 from datetime import date, datetime, timedelta
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 import httpx
 from dotenv import load_dotenv
@@ -161,6 +163,68 @@ async def fetch_esios_prices(target_date: date) -> list[float]:
     return prices
 
 
+# ── Posición solar y transposición al plano del panel ────
+# Modelo estándar (Duffie & Beckman) + cielo isotrópico (Liu-Jordan) para
+# convertir radiación horizontal en irradiancia sobre el plano inclinado
+# del panel, según su inclinación y orientación reales.
+
+MADRID_TZ = ZoneInfo("Europe/Madrid")
+
+
+def _solar_position(lat_deg: float, lon_deg: float, dt_local: datetime) -> tuple[float, float]:
+    """Devuelve (elevación, azimut) del sol en grados. Azimut: 0=N, 90=E, 180=S, 270=O."""
+    n = dt_local.timetuple().tm_yday
+    b = math.radians(360 / 365 * (n - 81))
+    eot = 9.87 * math.sin(2 * b) - 7.53 * math.cos(b) - 1.5 * math.sin(b)  # minutos
+
+    utc_offset_hours = dt_local.utcoffset().total_seconds() / 3600
+    local_std_meridian = utc_offset_hours * 15
+    tc = 4 * (lon_deg - local_std_meridian) + eot  # minutos
+    solar_time = dt_local.hour + dt_local.minute / 60 + tc / 60
+    hour_angle = math.radians(15 * (solar_time - 12))
+
+    decl = math.radians(23.45 * math.sin(math.radians(360 / 365 * (284 + n))))
+    lat = math.radians(lat_deg)
+
+    cos_zenith = math.sin(lat) * math.sin(decl) + math.cos(lat) * math.cos(decl) * math.cos(hour_angle)
+    cos_zenith = max(-1.0, min(1.0, cos_zenith))
+    zenith = math.acos(cos_zenith)
+    elevation = 90 - math.degrees(zenith)
+    if elevation <= 0:
+        return elevation, 180.0
+
+    sin_zenith = math.sin(zenith)
+    if abs(sin_zenith) < 1e-6:
+        return elevation, 180.0
+
+    cos_gamma_s = (cos_zenith * math.sin(lat) - math.sin(decl)) / (sin_zenith * math.cos(lat))
+    cos_gamma_s = max(-1.0, min(1.0, cos_gamma_s))
+    gamma_s = math.degrees(math.acos(cos_gamma_s))
+    if hour_angle < 0:
+        gamma_s = -gamma_s  # mañana: sol al este de sur
+
+    azimuth = (180 + gamma_s) % 360  # 0=N, 90=E, 180=S, 270=O (mismo criterio que InstallationParams.azimuth)
+    return elevation, azimuth
+
+
+def _poa_irradiance(ghi: float, dni: float, dhi: float, tilt_deg: float, panel_azimuth_deg: float,
+                     elevation_deg: float, sun_azimuth_deg: float) -> float:
+    """Irradiancia sobre el plano del panel (W/m²) dadas GHI/DNI/DHI horizontales."""
+    if elevation_deg <= 0:
+        return 0.0
+    tilt = math.radians(tilt_deg)
+    zenith = math.radians(90 - elevation_deg)
+    cos_aoi = (
+        math.cos(zenith) * math.cos(tilt)
+        + math.sin(zenith) * math.sin(tilt) * math.cos(math.radians(sun_azimuth_deg - panel_azimuth_deg))
+    )
+    beam = dni * max(0.0, cos_aoi)
+    diffuse = dhi * (1 + math.cos(tilt)) / 2  # cielo isotrópico
+    ground_albedo = 0.2
+    reflected = ghi * ground_albedo * (1 - math.cos(tilt)) / 2
+    return max(0.0, beam + diffuse + reflected)
+
+
 # ── Open-Meteo: predicción solar ─────────────────────────
 
 async def fetch_solar_forecast(
@@ -171,7 +235,7 @@ async def fetch_solar_forecast(
     params = {
         "latitude": lat,
         "longitude": lon,
-        "hourly": "shortwave_radiation",
+        "hourly": "shortwave_radiation,direct_normal_irradiance,diffuse_radiation",
         "start_date": str(target_date),
         "end_date": str(target_date),
         "timezone": "Europe/Madrid",
@@ -187,17 +251,28 @@ async def fetch_solar_forecast(
         )
 
     data = resp.json()
-    radiation = data.get("hourly", {}).get("shortwave_radiation", [])
+    hourly = data.get("hourly", {})
+    times = hourly.get("time", [])
+    ghi_list = hourly.get("shortwave_radiation", [])
+    dni_list = hourly.get("direct_normal_irradiance", [])
+    dhi_list = hourly.get("diffuse_radiation", [])
 
-    # Convertir W/m² → kW producido según kWp instalado
-    # Factor simplificado: producción = radiación × kWp × rendimiento / 1000
-    # Rendimiento típico ~0.80 (pérdidas por temperatura, cableado, inversor)
+    # Rendimiento del sistema (pérdidas por temperatura, cableado, inversor)
     efficiency = 0.80
     production = []
-    for r in radiation[:24]:
-        r = r or 0
-        kw = (r * kwp * efficiency) / 1000.0
-        production.append(round(kw, 3))
+    for i in range(min(24, len(times))):
+        ghi = ghi_list[i] or 0 if i < len(ghi_list) else 0
+        dni = dni_list[i] or 0 if i < len(dni_list) else 0
+        dhi = dhi_list[i] or 0 if i < len(dhi_list) else 0
+
+        # Los valores de Open-Meteo son medias de la hora anterior al timestamp;
+        # usamos el punto medio del intervalo para calcular la posición solar.
+        dt_local = datetime.fromisoformat(times[i]).replace(tzinfo=MADRID_TZ) - timedelta(minutes=30)
+        elevation, sun_azimuth = _solar_position(lat, lon, dt_local)
+        poa = _poa_irradiance(ghi, dni, dhi, tilt, azimuth, elevation, sun_azimuth)
+
+        kw = (poa * kwp * efficiency) / 1000.0
+        production.append(round(max(0.0, kw), 3))
 
     return production
 
