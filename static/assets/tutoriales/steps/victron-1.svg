@@ -1,0 +1,20 @@
+<svg width="360" height="440" viewBox="0 0 360 440" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="360" height="440" rx="28" fill="#0E3D2C"/>
+  <rect x="14" y="14" width="332" height="412" rx="20" fill="#FBFCEF"/>
+  <rect x="14" y="14" width="332" height="56" rx="20" fill="#157A4E"/>
+  <rect x="14" y="50" width="332" height="20" fill="#157A4E"/>
+  <text x="34" y="49" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#fff">VRM Portal</text>
+  <text x="180" y="418" font-family="Arial,sans-serif" font-size="11" fill="#8B9A6B" text-anchor="middle" font-weight="700">PASO 1 DE 5</text>
+
+  <circle cx="180" cy="150" r="42" fill="#E9EFB0"/>
+  <rect x="160" y="128" width="40" height="30" rx="6" fill="#157A4E"/>
+  <circle cx="180" cy="118" r="12" fill="#157A4E"/>
+  <text x="180" y="220" font-family="Arial,sans-serif" font-size="13" fill="#5C6B39" text-anchor="middle">Inicia sesión en tu cuenta de</text>
+  <text x="180" y="240" font-family="Arial,sans-serif" font-size="14" fill="#24301A" text-anchor="middle" font-weight="700">vrm.victronenergy.com</text>
+  <rect x="34" y="264" width="292" height="40" rx="10" fill="#fff" stroke="#D9E0A2" stroke-width="2"/>
+  <text x="50" y="289" font-family="Arial,sans-serif" font-size="12" fill="#8B9A6B">Usuario</text>
+  <rect x="34" y="314" width="292" height="40" rx="10" fill="#fff" stroke="#D9E0A2" stroke-width="2"/>
+  <text x="50" y="339" font-family="Arial,sans-serif" font-size="12" fill="#8B9A6B">••••••••</text>
+  <rect x="34" y="366" width="292" height="24" rx="12" fill="#157A4E"/>
+  <text x="180" y="382" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Entrar</text>
+</svg>

@@ -50,6 +50,18 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
 .tou-legend span{display:inline-flex;align-items:center;gap:5px}
 .tou-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
 
+.carousel{margin:0 auto 20px;max-width:280px}
+.carousel-track{position:relative;border-radius:16px;overflow:hidden}
+.carousel-track img{width:100%}
+.carousel-track img.carousel-slide{display:none}
+.carousel-track img.carousel-slide.active{display:block}
+.carousel-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px}
+.carousel-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--bdr);background:#fff;color:var(--ink);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.carousel-btn:hover{border-color:var(--green);color:var(--green)}
+.carousel-dots{display:flex;gap:6px}
+.carousel-dot{width:7px;height:7px;border-radius:50%;background:var(--bdr);border:none;cursor:pointer;padding:0}
+.carousel-dot.active{background:var(--green);width:16px;border-radius:4px}
+
 .ctaband{margin-top:40px;background:var(--forest);border-radius:20px;padding:32px;text-align:center}
 .ctaband p{color:#DCEBC8;font-size:14px;margin-bottom:18px}
 .btn-primary{display:inline-block;padding:13px 28px;background:#fff;color:var(--forest);border:none;border-radius:999px;font-family:var(--ff);font-size:14.5px;font-weight:800;text-decoration:none}
@@ -89,7 +101,20 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <img src="/static/assets/tutoriales/huawei-mockup.svg" alt="Ilustración orientativa: pantalla de control de batería con franjas de carga y descarga (representación propia, no una captura real de la app)" style="width:100%;max-width:280px;display:block;margin:0 auto 20px;border-radius:16px"/>
+        <div class="carousel" data-carousel>
+          <div class="carousel-track">
+            <img class="carousel-slide active" src="/static/assets/tutoriales/steps/huawei-1.svg" alt="Paso 1: iniciar sesión en FusionSolar (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/huawei-2.svg" alt="Paso 2: navegar a Ajuste de potencia → Control de batería (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/huawei-3.svg" alt="Paso 3: activar Cargar desde red (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/huawei-4.svg" alt="Paso 4: definir tramos de carga y descarga (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/huawei-5.svg" alt="Paso 5: guardar ajustes (ilustración propia, no captura real)"/>
+          </div>
+          <div class="carousel-nav">
+            <button class="carousel-btn" data-prev aria-label="Paso anterior">‹</button>
+            <div class="carousel-dots"></div>
+            <button class="carousel-btn" data-next aria-label="Paso siguiente">›</button>
+          </div>
+        </div>
         <p class="lead">En Huawei/LUNA2000 la función se llama <strong>modo TOU (Time of Use)</strong>: programas manualmente los tramos en los que la batería carga y descarga. Un uso típico: dejar que la red cargue la batería de madrugada (barata) y descargarla en las horas caras del día.</p>
         <ol class="steps">
           <li>Abre la app FusionSolar e inicia sesión (como instalador si tienes ese acceso, o como propietario).</li>
@@ -114,7 +139,20 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <img src="/static/assets/tutoriales/fronius-mockup.svg" alt="Ilustración orientativa: pantalla de gestión de batería con un tramo de descarga forzada (representación propia, no una captura real de la app)" style="width:100%;max-width:280px;display:block;margin:0 auto 20px;border-radius:16px"/>
+        <div class="carousel" data-carousel>
+          <div class="carousel-track">
+            <img class="carousel-slide active" src="/static/assets/tutoriales/steps/fronius-1.svg" alt="Paso 1: iniciar sesión en Solar.web (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/fronius-2.svg" alt="Paso 2: navegar a Ajustes → Componentes → Interfaz web (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/fronius-3.svg" alt="Paso 3: revisar el SOC mínimo (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/fronius-4.svg" alt="Paso 4: añadir un tramo de descarga forzada (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/fronius-5.svg" alt="Paso 5: guardar los cambios (ilustración propia, no captura real)"/>
+          </div>
+          <div class="carousel-nav">
+            <button class="carousel-btn" data-prev aria-label="Paso anterior">‹</button>
+            <div class="carousel-dots"></div>
+            <button class="carousel-btn" data-next aria-label="Paso siguiente">›</button>
+          </div>
+        </div>
         <p class="lead">Fronius llama a esta función <strong>Time-of-Use</strong> (control de batería por franjas horarias). No todos los inversores domésticos la traen activada de fábrica — si no la ves, consulta con tu instalador.</p>
         <ol class="steps">
           <li>Entra en Solar.web con tu cuenta.</li>
@@ -139,7 +177,20 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
         <div class="chev">▾</div>
       </div>
       <div class="brand-body"><div class="brand-body-in">
-        <img src="/static/assets/tutoriales/victron-mockup.svg" alt="Ilustración orientativa: pantalla de carga programada con dos tramos y su SOC objetivo (representación propia, no una captura real de la app)" style="width:100%;max-width:280px;display:block;margin:0 auto 20px;border-radius:16px"/>
+        <div class="carousel" data-carousel>
+          <div class="carousel-track">
+            <img class="carousel-slide active" src="/static/assets/tutoriales/steps/victron-1.svg" alt="Paso 1: iniciar sesión en el VRM Portal (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/victron-2.svg" alt="Paso 2: navegar a la configuración del dispositivo GX → ESS (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/victron-3.svg" alt="Paso 3: ver los tramos de carga programada (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/victron-4.svg" alt="Paso 4: editar el SOC objetivo de un tramo (ilustración propia, no captura real)"/>
+            <img class="carousel-slide" src="/static/assets/tutoriales/steps/victron-5.svg" alt="Paso 5: aplicar los cambios (ilustración propia, no captura real)"/>
+          </div>
+          <div class="carousel-nav">
+            <button class="carousel-btn" data-prev aria-label="Paso anterior">‹</button>
+            <div class="carousel-dots"></div>
+            <button class="carousel-btn" data-next aria-label="Paso siguiente">›</button>
+          </div>
+        </div>
         <p class="lead">En Victron se llama <strong>Scheduled Charging</strong> y vive en el menú ESS del dispositivo GX, gestionado desde VRM.</p>
         <ol class="steps">
           <li>Entra en <span class="field">vrm.victronenergy.com</span> con tu cuenta.</li>
@@ -185,6 +236,28 @@ h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:800;let
 function toggle(id) {
   document.getElementById(id).classList.toggle('open');
 }
+
+// Carrusel de pasos (ilustraciones propias) — sin librerías
+document.querySelectorAll('[data-carousel]').forEach(car => {
+  const slides = [...car.querySelectorAll('.carousel-slide')];
+  const dotsBox = car.querySelector('.carousel-dots');
+  let i = 0;
+  slides.forEach((_, idx) => {
+    const dot = document.createElement('button');
+    dot.className = 'carousel-dot' + (idx === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Ir al paso ${idx + 1}`);
+    dot.addEventListener('click', () => show(idx));
+    dotsBox.appendChild(dot);
+  });
+  const dots = [...dotsBox.children];
+  function show(n) {
+    i = (n + slides.length) % slides.length;
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+  }
+  car.querySelector('[data-prev]').addEventListener('click', () => show(i - 1));
+  car.querySelector('[data-next]').addEventListener('click', () => show(i + 1));
+});
 // Si llegamos con un hash (#huawei, #fronius...), abre esa tarjeta y desplaza hasta ella
 const hash = location.hash.replace('#','');
 if (hash && document.getElementById(hash)) {

@@ -1,0 +1,16 @@
+<svg width="360" height="440" viewBox="0 0 360 440" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="360" height="440" rx="28" fill="#0E3D2C"/>
+  <rect x="14" y="14" width="332" height="412" rx="20" fill="#FBFCEF"/>
+  <rect x="14" y="14" width="332" height="56" rx="20" fill="#157A4E"/>
+  <rect x="14" y="50" width="332" height="20" fill="#157A4E"/>
+  <text x="34" y="49" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#fff">Nuevo tramo</text>
+  <text x="180" y="418" font-family="Arial,sans-serif" font-size="11" fill="#8B9A6B" text-anchor="middle" font-weight="700">PASO 4 DE 5</text>
+
+  <rect x="34" y="110" width="292" height="46" rx="10" fill="#E9EFB0"/>
+  <text x="48" y="138" font-family="monospace" font-size="13" fill="#24301A">19:00–23:00</text>
+  <rect x="236" y="121" width="90" height="22" rx="11" fill="#157A4E"/>
+  <text x="281" y="136" font-family="Arial,sans-serif" font-size="10" fill="#fff" font-weight="700" text-anchor="middle">DESCARGA</text>
+
+  <rect x="34" y="176" width="292" height="36" rx="10" fill="#E9EFB0" stroke="#8CC63F" stroke-width="2" stroke-dasharray="5 5"/>
+  <text x="180" y="199" font-family="Arial,sans-serif" font-size="16" fill="#157A4E" text-anchor="middle" font-weight="700">+ añadir tramo</text>
+</svg>
