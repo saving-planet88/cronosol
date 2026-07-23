@@ -239,9 +239,9 @@ LOCATION_KEYBOARD = {
 REMOVE_KEYBOARD = {"remove_keyboard": True}
 
 # Teclado persistente con las acciones principales — así el usuario no tiene
-# que aprenderse ni escribir comandos para lo del día a día. Los ajustes más
-# finos (marca de inversor, hora exacta) siguen siendo comandos de texto,
-# pero esos se tocan una vez y ya está.
+# que aprenderse ni escribir comandos para lo del día a día. Para cambiar
+# cualquier ajuste basta con escribir la palabra (paneles, batería, hora...)
+# o tocar el botón correspondiente — nada de sintaxis tipo "/paneles 5".
 BTN_PLAN_HOY = "📊 Plan de hoy"
 BTN_PLAN_MANANA = "🌙 Plan de mañana"
 BTN_CONFIG = "⚙️ Mi configuración"
@@ -255,6 +255,60 @@ MAIN_KEYBOARD = {
         [{"text": BTN_TUTORIALES}],
     ],
     "resize_keyboard": True,
+}
+
+BTN_CAMBIAR_UBICACION = "📍 Ubicación"
+BTN_CAMBIAR_PANELES = "☀️ Paneles"
+BTN_CAMBIAR_BATERIA = "🔋 Batería"
+BTN_CAMBIAR_CONSUMO = "⚡ Consumo"
+BTN_CAMBIAR_INVERSOR = "🔌 Marca de inversor"
+BTN_CAMBIAR_HORA = "⏰ Hora del aviso"
+BTN_VOLVER = "⬅️ Volver"
+
+RECONFIG_KEYBOARD = {
+    "keyboard": [
+        [{"text": BTN_CAMBIAR_UBICACION}, {"text": BTN_CAMBIAR_PANELES}],
+        [{"text": BTN_CAMBIAR_BATERIA}, {"text": BTN_CAMBIAR_CONSUMO}],
+        [{"text": BTN_CAMBIAR_INVERSOR}, {"text": BTN_CAMBIAR_HORA}],
+        [{"text": BTN_VOLVER}],
+    ],
+    "resize_keyboard": True,
+}
+
+INVERTER_KEYBOARD = {
+    "keyboard": [
+        [{"text": "Huawei"}, {"text": "Fronius"}],
+        [{"text": "Victron"}, {"text": "Otra marca"}],
+    ],
+    "resize_keyboard": True,
+}
+
+HOUR_KEYBOARD = {
+    "keyboard": [[{"text": "14:00"}, {"text": "16:00"}, {"text": "18:00"}, {"text": "20:00"}]],
+    "resize_keyboard": True,
+}
+
+# Palabras sueltas (sin "/") que hacen lo mismo que su boton/comando equivalente
+RECONFIG_WORD_TO_FIELD = {
+    "ubicacion": "location", "ubicación": "location", "localizacion": "location", "localización": "location",
+    "paneles": "kwp", "placas": "kwp", "kwp": "kwp",
+    "bateria": "battery", "batería": "battery",
+    "consumo": "consumption",
+    "inversor": "inverter", "marca": "inverter",
+    "hora": "hour",
+}
+RECONFIG_BUTTON_TO_FIELD = {
+    BTN_CAMBIAR_UBICACION: "location", BTN_CAMBIAR_PANELES: "kwp", BTN_CAMBIAR_BATERIA: "battery",
+    BTN_CAMBIAR_CONSUMO: "consumption", BTN_CAMBIAR_INVERSOR: "inverter", BTN_CAMBIAR_HORA: "hour",
+}
+
+RECONFIG_PROMPTS = {
+    "location": ("📍 ¿Dónde está tu instalación? Comparte tu ubicación o escribe el nombre de tu localidad.", LOCATION_KEYBOARD),
+    "kwp": ("☀️ ¿Cuántos kWp tienes instalados? (ej. 5)", None),
+    "battery": ("🔋 ¿Capacidad de tu batería en kWh? (escribe 0 si no tienes)", None),
+    "consumption": ("⚡ ¿Tu consumo medio diario en kWh? (ej. 12)", None),
+    "inverter": ("🔌 ¿Qué marca de inversor tienes?", None),
+    "hour": ("⏰ ¿A qué hora quieres recibir tu plan diario? (entre las 14 y las 22)", None),
 }
 
 STEP_PROMPTS = {
@@ -377,10 +431,13 @@ async def handle_message(msg, users):
             chat_id,
             "☀️ *CronoSolar* — Optimiza tu autoconsumo solar\n\n"
             "Te hago 5 preguntas rápidas y ya está. Puedes saltarte cualquiera "
-            "escribiendo /plan para usar valores por defecto.\n\n"
-            "Cada tarde (a las 16:00 por defecto, cambiable con /hora) te mando el "
-            "plan del día siguiente para que programes tu inversor con calma y te "
-            "olvides. Sin avisos cada hora — para eso está el propio inversor.\n\n"
+            "escribiendo *plan* para usar valores por defecto.\n\n"
+            "Nada de comandos que aprenderse: para cambiar cualquier cosa más "
+            "adelante (paneles, batería, hora del aviso...) basta con escribir "
+            "esa palabra o tocar el botón — te lo pregunto yo.\n\n"
+            "Cada tarde (a las 16:00 por defecto) te mando el plan del día "
+            "siguiente para que programes tu inversor con calma y te olvides. "
+            "Sin avisos cada hora — para eso está el propio inversor.\n\n"
             "Primero: ¿dónde está tu instalación? Comparte tu ubicación o "
             "escribe el nombre de tu localidad.",
             reply_markup=LOCATION_KEYBOARD,
@@ -394,18 +451,18 @@ async def handle_message(msg, users):
     u = users[chat_id]
     awaiting = u.get("awaiting")
 
-    # Botones del teclado persistente — mismo destino que sus comandos equivalentes
-    if text == BTN_PLAN_HOY:
+    # Botones del teclado persistente, o la palabra suelta equivalente sin "/"
+    if text == BTN_PLAN_HOY or text.lower() in ("plan", "hoy"):
         u["awaiting"] = None
         save_users(users)
         await send_today_plan(chat_id, u, users)
         return
 
-    if text == BTN_PLAN_MANANA:
+    if text == BTN_PLAN_MANANA or text.lower() in ("manana", "mañana"):
         await send_tomorrow_plan(chat_id, u, users)
         return
 
-    if text == BTN_CONFIG:
+    if text == BTN_CONFIG or text.lower() in ("config", "configuracion", "configuración", "ajustes"):
         avisos = "on" if u.get("hourly_alerts") else "off"
         await send_message(
             chat_id,
@@ -413,22 +470,48 @@ async def handle_message(msg, users):
             f"☀️ Paneles: {u['kwp']} kWp\n"
             f"🔋 Batería: {u['battery']} kWh\n"
             f"⚡ Consumo: {u['consumption']} kWh/día\n"
-            f"🔌 Inversor: {INVERTER_LABELS.get(u.get('inverter'), 'no indicado')} (/marca huawei|fronius|victron|otro)\n"
-            f"⏰ Plan diario a las: {u.get('alert_hour', DAILY_SEND_HOUR):02d}:00 (/hora HH)\n"
-            f"🔔 Avisos horarios: {avisos}"
+            f"🔌 Inversor: {INVERTER_LABELS.get(u.get('inverter'), 'no indicado')}\n"
+            f"⏰ Plan diario a las: {u.get('alert_hour', DAILY_SEND_HOUR):02d}:00\n"
+            f"🔔 Avisos horarios: {avisos}\n\n"
+            "¿Quieres cambiar algo? Toca un botón 👇",
+            reply_markup=RECONFIG_KEYBOARD,
         )
         return
 
-    if text == BTN_AVISOS:
+    if text == BTN_VOLVER:
+        u["awaiting"] = None
+        save_users(users)
+        await send_message(chat_id, "Vale, aquí tienes el menú principal 👇", reply_markup=MAIN_KEYBOARD)
+        return
+
+    # Cambiar un ajuste: tocando el botón del menú de configuración, o
+    # simplemente escribiendo la palabra ("paneles", "hora"...) desde cualquier
+    # sitio — sin necesidad de recordar comandos con "/". Se ignora mientras
+    # el onboarding inicial está en marcha, para no confundir una respuesta
+    # real (p.ej. a "qué marca de inversor tienes") con un atajo de menú.
+    onboarding_live = awaiting in STEP_ORDER
+    reconfig_field = None if onboarding_live else (RECONFIG_BUTTON_TO_FIELD.get(text) or RECONFIG_WORD_TO_FIELD.get(text.lower()))
+    if reconfig_field:
+        u["awaiting"] = f"reconfig_{reconfig_field}"
+        save_users(users)
+        prompt, kb = RECONFIG_PROMPTS[reconfig_field]
+        if reconfig_field == "inverter":
+            kb = INVERTER_KEYBOARD
+        elif reconfig_field == "hour":
+            kb = HOUR_KEYBOARD
+        await send_message(chat_id, prompt, reply_markup=kb)
+        return
+
+    if text == BTN_AVISOS or text.lower() == "avisos":
         u["hourly_alerts"] = not u.get("hourly_alerts", False)
         save_users(users)
         if u["hourly_alerts"]:
-            await send_message(chat_id, "🔔 Avisos horarios *activados* — te avisaré cada vez que cambie la acción recomendada, además del plan de la tarde. Pulsa de nuevo el botón para desactivarlos.")
+            await send_message(chat_id, "🔔 Avisos horarios *activados* — te avisaré cada vez que cambie la acción recomendada, además del plan de la tarde. Escribe *avisos* de nuevo para desactivarlos.")
         else:
             await send_message(chat_id, "🔕 Avisos horarios *desactivados* — seguirás recibiendo el plan cada tarde para programar tu inversor.")
         return
 
-    if text == BTN_TUTORIALES:
+    if text == BTN_TUTORIALES or text.lower() in ("tutoriales", "guia", "guía", "tutorial"):
         inv = u.get("inverter")
         link = f"{WEB_PUBLIC_URL}/tutoriales#{inv}" if inv else f"{WEB_PUBLIC_URL}/tutoriales"
         await send_message(chat_id, f"🔧 [Cómo programar tu inversor]({link})")
@@ -577,7 +660,53 @@ async def handle_message(msg, users):
         await advance_step(chat_id, u, users, "inverter")
         return
 
-    await send_message(chat_id, "No te he entendido. Escribe /plan para ver lo que queda de hoy, /plan manana para el de mañana, o /start para reconfigurar.")
+    # Respuestas al cambiar un ajuste desde "Mi configuración" (o escribiendo
+    # la palabra directamente) — a diferencia del onboarding, esto edita un
+    # solo campo y vuelve al menú principal, sin encadenar más preguntas.
+    if awaiting == "reconfig_location":
+        result = await geocode_place(text)
+        if not result:
+            await send_message(chat_id, "No he encontrado esa localidad. Prueba con otro nombre, o comparte tu ubicación con el botón.", reply_markup=LOCATION_KEYBOARD)
+            return
+        u["lat"], u["lon"], u["location"] = result
+        u["awaiting"] = None
+        save_users(users)
+        await send_message(chat_id, f"📍 Ubicación actualizada: *{u['location']}*", reply_markup=MAIN_KEYBOARD)
+        return
+
+    if awaiting in ("reconfig_kwp", "reconfig_battery", "reconfig_consumption"):
+        num = extract_number(text)
+        if num is None:
+            await send_message(chat_id, "No he entendido ese número, prueba de nuevo (ej. 5.5).")
+            return
+        field = {"reconfig_kwp": "kwp", "reconfig_battery": "battery", "reconfig_consumption": "consumption"}[awaiting]
+        u[field] = num
+        u["awaiting"] = None
+        save_users(users)
+        label = {"kwp": f"☀️ Paneles actualizados: {num} kWp", "battery": f"🔋 Batería actualizada: {num} kWh", "consumption": f"⚡ Consumo actualizado: {num} kWh/día"}[field]
+        await send_message(chat_id, label, reply_markup=MAIN_KEYBOARD)
+        return
+
+    if awaiting == "reconfig_inverter":
+        inv = normalize_inverter(text)
+        u["inverter"] = inv
+        u["awaiting"] = None
+        save_users(users)
+        await send_message(chat_id, f"🔌 Inversor actualizado: {INVERTER_LABELS[inv]}", reply_markup=MAIN_KEYBOARD)
+        return
+
+    if awaiting == "reconfig_hour":
+        hour = extract_number(text)
+        if hour is None or not (14 <= int(hour) <= 22):
+            await send_message(chat_id, "Elige una hora entre las 14 y las 22 (antes ESIOS aún no ha publicado el precio de mañana) — ej. 18.", reply_markup=HOUR_KEYBOARD)
+            return
+        u["alert_hour"] = int(hour)
+        u["awaiting"] = None
+        save_users(users)
+        await send_message(chat_id, f"⏰ Tu plan diario llegará a las *{int(hour):02d}:00* a partir de hoy.", reply_markup=MAIN_KEYBOARD)
+        return
+
+    await send_message(chat_id, "No te he entendido. Escribe *plan* para ver lo que queda de hoy, o toca los botones de abajo 👇", reply_markup=MAIN_KEYBOARD)
 
 
 # ── Scheduler: alerta cuando cambia la accion (solo opt-in, /avisos on) ──

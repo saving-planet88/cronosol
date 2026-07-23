@@ -59,7 +59,8 @@ a:hover{color:var(--green)}
     <div style="max-width:640px">
       <div class="fadeup" style="display:inline-flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--bdr);border-radius:999px;padding:7px 15px;font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:22px;font-weight:600">☀ Precio + sol, hora a hora · Gratis</div>
       <h1 class="fadeup" style="animation-delay:.12s;font-size:clamp(42px,6vw,74px);font-weight:300;letter-spacing:-2.4px;line-height:1.0;margin-bottom:22px;text-wrap:balance">Vive al ritmo <span style="font-weight:800;background:var(--green);-webkit-background-clip:text;background-clip:text;color:transparent">del sol</span>,<br><span style="font-weight:800">no del contador.</span></h1>
-      <p class="fadeup" style="animation-delay:.24s;font-size:17.5px;color:var(--muted);max-width:470px;margin-bottom:32px;text-wrap:pretty">CronoSolar cruza el precio real del mercado eléctrico con la previsión de tu producción solar, y te dice hora a hora cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes.</p>
+      <p class="fadeup" style="animation-delay:.24s;font-size:17.5px;color:var(--muted);max-width:470px;margin-bottom:14px;text-wrap:pretty">CronoSolar cruza el precio real del mercado eléctrico con la previsión de tu producción solar, y te dice hora a hora cuándo cargar la batería, cuándo descargarla y cuándo verter excedentes.</p>
+      <p class="fadeup" style="animation-delay:.30s;font-size:14px;color:var(--muted);max-width:470px;margin-bottom:32px">Pensado para quien ya tiene placas (con o sin batería) en su vivienda y quiere sacarles el máximo partido a la factura — sin gastar más ni cambiar de instalación.</p>
       <div class="fadeup" style="animation-delay:.36s;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
         <a href="#calc" style="background:var(--green);color:#fff;padding:16px 32px;border-radius:999px;font-weight:700;font-size:16px">Calcula tu ahorro →</a>
         <a href="#como-funciona" style="background:var(--cream);border:1px solid var(--bdr);color:var(--ink);padding:15px 28px;border-radius:999px;font-weight:600;font-size:16px">Cómo funciona</a>
@@ -98,8 +99,13 @@ a:hover{color:var(--green)}
           <input type="number" id="c-bat" value="10" step="0.5" min="0" style="width:100%;padding:13px;background:var(--lemon-lite);border:1px solid var(--bdr);border-radius:12px;color:var(--ink);font-family:var(--mono);font-size:14px;outline:none"/>
         </div>
       </div>
+      <div>
+        <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600">Consumo diario (kWh) — mira tu factura</label>
+        <input type="number" id="c-cons" value="12" step="0.5" min="1" style="width:100%;padding:13px;background:var(--lemon-lite);border:1px solid var(--bdr);border-radius:12px;color:var(--ink);font-family:var(--mono);font-size:14px;outline:none"/>
+      </div>
       <div id="c-status" style="font-size:12px;min-height:15px;margin-top:-4px;color:var(--muted);font-weight:500"></div>
       <button id="c-btn" onclick="calcular()" style="margin-top:auto;width:100%;padding:15px;background:var(--green);color:#fff;border:none;border-radius:14px;font-family:var(--ff);font-size:15.5px;font-weight:700;cursor:pointer">Calcular mi ahorro</button>
+      <div style="font-size:11px;color:var(--muted);line-height:1.5">Estimación con tejado orientado al sur e inclinación estándar (30°) y precios/sol reales de mañana. Para tu orientación exacta y el plan hora a hora, usa la <a href="/optimizar" style="color:var(--green);font-weight:600">calculadora completa</a>.</div>
     </div>
 
     <div style="background:var(--lemon-lite);border:1px solid var(--bdr);border-radius:16px;padding:24px;display:flex;flex-direction:column">
@@ -205,7 +211,7 @@ a:hover{color:var(--green)}
   <section id="alertas" style="padding:70px 0">
     <div style="text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);margin-bottom:12px;font-weight:500">Un mensaje, no cuatro</div>
     <h2 style="font-size:clamp(28px,3.8vw,44px);font-weight:800;letter-spacing:-1.2px;text-align:center;margin-bottom:14px">Así son las alertas de Telegram</h2>
-    <p style="font-size:15px;color:var(--muted);text-align:center;max-width:560px;margin:0 auto 46px">Cada tarde (a las 16:00 por defecto, tú eliges la hora con /hora) — en cuanto se conoce el precio de mañana — recibes el plan completo del día siguiente. Lo programas en tu inversor esa noche, con calma, y ya está.</p>
+    <p style="font-size:15px;color:var(--muted);text-align:center;max-width:560px;margin:0 auto 46px">Cada tarde (a las 16:00 por defecto — escribe <em>hora</em> en el bot si prefieres otra) — en cuanto se conoce el precio de mañana — recibes el plan completo del día siguiente. Lo programas en tu inversor esa noche, con calma, y ya está.</p>
     <div style="display:grid;grid-template-columns:.9fr 1.1fr;gap:44px;align-items:center">
       <div style="background:#17212b;border-radius:16px;padding:16px;max-width:340px;margin:0 auto">
         <div style="background:#1e2c3a;border-radius:16px;padding:15px 17px;font-size:12.5px">
@@ -224,8 +230,8 @@ a:hover{color:var(--green)}
       </div>
       <div>
         <p style="font-size:15.5px;color:var(--muted);margin-bottom:16px"><strong style="color:var(--ink)">Un mensaje al día, la tarde antes</strong> — no una alerta cada hora que nadie tiene tiempo de leer. Si tu inversor permite programar franjas horarias (mira /tutoriales), lo configuras una vez y él solo ejecuta el plan.</p>
-        <p style="font-size:15.5px;color:var(--muted);margin-bottom:16px">¿Se te pasó y ya estás a media tarde? <code style="background:#fff;border:1px solid var(--bdr);border-radius:6px;padding:1px 6px;font-size:13px">/plan</code> te da lo que queda de hoy; <code style="background:#fff;border:1px solid var(--bdr);border-radius:6px;padding:1px 6px;font-size:13px">/plan manana</code> te adelanta el de mañana en cuanto esté disponible.</p>
-        <p style="font-size:15.5px;color:var(--muted);margin-bottom:22px">¿Tu inversor no permite programación? Activa <code style="background:#fff;border:1px solid var(--bdr);border-radius:6px;padding:1px 6px;font-size:13px">/avisos on</code> y te avisamos en tiempo real cada vez que toca cambiar de acción.</p>
+        <p style="font-size:15.5px;color:var(--muted);margin-bottom:16px">¿Se te pasó y ya estás a media tarde? Escribe <code style="background:#fff;border:1px solid var(--bdr);border-radius:6px;padding:1px 6px;font-size:13px">plan</code> y te doy lo que queda de hoy; escribe <code style="background:#fff;border:1px solid var(--bdr);border-radius:6px;padding:1px 6px;font-size:13px">mañana</code> para adelantarte el de mañana en cuanto esté disponible. Nada de sintaxis rara — solo la palabra, o los botones del propio chat.</p>
+        <p style="font-size:15.5px;color:var(--muted);margin-bottom:22px">¿Tu inversor no permite programación? Escribe <code style="background:#fff;border:1px solid var(--bdr);border-radius:6px;padding:1px 6px;font-size:13px">avisos</code> y te avisamos en tiempo real cada vez que toca cambiar de acción.</p>
         <a href="https://t.me/Cronosolar_bot" target="_blank" style="display:inline-block;background:var(--green);color:#fff;padding:14px 28px;border-radius:999px;font-size:15px;font-weight:600">Probar el bot →</a>
       </div>
     </div>
@@ -349,6 +355,7 @@ async function calcular() {
   const place = document.getElementById('c-place').value.trim();
   const kwp = +document.getElementById('c-kwp').value;
   const bat = +document.getElementById('c-bat').value;
+  const cons = +document.getElementById('c-cons').value || 12;
 
   if (!place) { status.style.color = '#B45309'; status.textContent = 'Escribe tu localidad o código postal.'; return; }
 
@@ -363,7 +370,7 @@ async function calcular() {
     const r = await fetch(`/api/optimize?target_date=${tomorrow}`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({latitude: loc.lat, longitude: loc.lon, kwp, battery_kwh: bat, daily_consumption_kwh: 12}),
+      body: JSON.stringify({latitude: loc.lat, longitude: loc.lon, kwp, battery_kwh: bat, daily_consumption_kwh: cons}),
     });
     if (!r.ok) throw new Error('API error');
     const d = await r.json();
@@ -376,7 +383,7 @@ async function calcular() {
     document.getElementById('c-co2').textContent = annualCo2 + ' kg';
     document.getElementById('c-self').textContent = annualSelf.toLocaleString('es-ES') + ' kWh';
     const link = document.getElementById('c-link');
-    link.href = `/optimizar?lat=${loc.lat}&lon=${loc.lon}&kwp=${kwp}&battery=${bat}&consumption=12&date=${tomorrow}`;
+    link.href = `/optimizar?lat=${loc.lat}&lon=${loc.lon}&kwp=${kwp}&battery=${bat}&consumption=${cons}&date=${tomorrow}`;
     link.style.display = 'block';
     status.textContent = '';
   } catch (e) {
