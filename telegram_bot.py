@@ -216,12 +216,46 @@ async def get_updates(offset=None):
         resp = await client.get(f"{BASE_URL}/getUpdates", params=params)
     return resp.json().get("result", [])
 
+async def set_bot_commands():
+    """Registra los comandos en Telegram para que salgan con descripción al escribir '/'."""
+    commands = [
+        {"command": "plan", "description": "Lo que queda de hoy"},
+        {"command": "start", "description": "Configurar o reconfigurar"},
+        {"command": "config", "description": "Ver tu configuración"},
+        {"command": "avisos", "description": "Avisos horarios on/off"},
+        {"command": "hora", "description": "Hora del plan diario"},
+        {"command": "marca", "description": "Marca de tu inversor"},
+    ]
+    async with httpx.AsyncClient() as client:
+        r = await client.post(f"{BASE_URL}/setMyCommands", json={"commands": commands})
+        if r.status_code != 200:
+            log.error(f"setMyCommands error {r.status_code}: {r.text[:200]}")
+
 LOCATION_KEYBOARD = {
     "keyboard": [[{"text": "📍 Compartir mi ubicación", "request_location": True}]],
     "resize_keyboard": True,
     "one_time_keyboard": True,
 }
 REMOVE_KEYBOARD = {"remove_keyboard": True}
+
+# Teclado persistente con las acciones principales — así el usuario no tiene
+# que aprenderse ni escribir comandos para lo del día a día. Los ajustes más
+# finos (marca de inversor, hora exacta) siguen siendo comandos de texto,
+# pero esos se tocan una vez y ya está.
+BTN_PLAN_HOY = "📊 Plan de hoy"
+BTN_PLAN_MANANA = "🌙 Plan de mañana"
+BTN_CONFIG = "⚙️ Mi configuración"
+BTN_AVISOS = "🔔 Avisos horarios"
+BTN_TUTORIALES = "🔧 Cómo programar mi inversor"
+
+MAIN_KEYBOARD = {
+    "keyboard": [
+        [{"text": BTN_PLAN_HOY}, {"text": BTN_PLAN_MANANA}],
+        [{"text": BTN_CONFIG}, {"text": BTN_AVISOS}],
+        [{"text": BTN_TUTORIALES}],
+    ],
+    "resize_keyboard": True,
+}
 
 STEP_PROMPTS = {
     "kwp": "☀️ ¿Cuántos *kWp* tienes instalados? (ej. 5)\n\nO escribe /plan para usar 5 kWp por defecto.",
@@ -275,6 +309,7 @@ async def advance_step(chat_id, u, users, current_step):
     else:
         u["awaiting"] = None
         save_users(users)
+        await send_message(chat_id, "Ya tienes todo listo. Usa los botones de abajo para lo del día a día 👇", reply_markup=MAIN_KEYBOARD)
         await send_today_plan(chat_id, u, users, intro="✅ *Todo listo — así queda hoy*")
 
 
@@ -358,6 +393,46 @@ async def handle_message(msg, users):
 
     u = users[chat_id]
     awaiting = u.get("awaiting")
+
+    # Botones del teclado persistente — mismo destino que sus comandos equivalentes
+    if text == BTN_PLAN_HOY:
+        u["awaiting"] = None
+        save_users(users)
+        await send_today_plan(chat_id, u, users)
+        return
+
+    if text == BTN_PLAN_MANANA:
+        await send_tomorrow_plan(chat_id, u, users)
+        return
+
+    if text == BTN_CONFIG:
+        avisos = "on" if u.get("hourly_alerts") else "off"
+        await send_message(
+            chat_id,
+            f"📍 {u.get('location', '?')} ({u['lat']}, {u['lon']})\n"
+            f"☀️ Paneles: {u['kwp']} kWp\n"
+            f"🔋 Batería: {u['battery']} kWh\n"
+            f"⚡ Consumo: {u['consumption']} kWh/día\n"
+            f"🔌 Inversor: {INVERTER_LABELS.get(u.get('inverter'), 'no indicado')} (/marca huawei|fronius|victron|otro)\n"
+            f"⏰ Plan diario a las: {u.get('alert_hour', DAILY_SEND_HOUR):02d}:00 (/hora HH)\n"
+            f"🔔 Avisos horarios: {avisos}"
+        )
+        return
+
+    if text == BTN_AVISOS:
+        u["hourly_alerts"] = not u.get("hourly_alerts", False)
+        save_users(users)
+        if u["hourly_alerts"]:
+            await send_message(chat_id, "🔔 Avisos horarios *activados* — te avisaré cada vez que cambie la acción recomendada, además del plan de la tarde. Pulsa de nuevo el botón para desactivarlos.")
+        else:
+            await send_message(chat_id, "🔕 Avisos horarios *desactivados* — seguirás recibiendo el plan cada tarde para programar tu inversor.")
+        return
+
+    if text == BTN_TUTORIALES:
+        inv = u.get("inverter")
+        link = f"{WEB_PUBLIC_URL}/tutoriales#{inv}" if inv else f"{WEB_PUBLIC_URL}/tutoriales"
+        await send_message(chat_id, f"🔧 [Cómo programar tu inversor]({link})")
+        return
 
     # Comandos explicitos — funcionan siempre, incluso a media conversacion
     if text.startswith("/ubicacion"):
@@ -578,6 +653,7 @@ async def main():
     offset = None
     last_hour_tick = -1
 
+    await set_bot_commands()
     log.info("CronoSolar Telegram bot iniciado")
 
     while True:
