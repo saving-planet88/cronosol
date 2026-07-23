@@ -4,6 +4,7 @@ Backend FastAPI: conecta con ESIOS (precios pool) y Open-Meteo (radiación solar
 calcula el plan óptimo de carga/descarga y estima el ahorro.
 """
 
+import json
 import os
 from datetime import date, datetime, timedelta
 from typing import Optional
@@ -24,6 +25,41 @@ ESIOS_INDICATOR = 600
 
 app = FastAPI(title="SolOptim API")
 templates = Jinja2Templates(directory="templates")
+
+BLOG_POSTS = [
+    {
+        "slug": "consumo-y-clima",
+        "tag": "Red eléctrica",
+        "title": "Por qué la hora de tu enchufe importa para el clima",
+        "excerpt": "El precio del mercado eléctrico y la limpieza de la red se mueven casi siempre juntos. Así funciona la conexión, y por qué mover tu consumo aprovecha ambas cosas a la vez.",
+        "date": "2026-07-23",
+        "read_time": "4 min",
+    },
+    {
+        "slug": "cambio-climatico-5-datos",
+        "tag": "Contexto",
+        "title": "El cambio climático explicado en 5 datos (con fuentes)",
+        "excerpt": "Cinco datos consolidados por la ciencia del clima —IPCC, IEA, IRENA— y por qué decisiones cotidianas como cuándo enciendes un electrodoméstico siguen teniendo sentido.",
+        "date": "2026-07-23",
+        "read_time": "5 min",
+    },
+    {
+        "slug": "cuanto-co2-evita-el-autoconsumo",
+        "tag": "Metodología",
+        "title": "Cuánto CO₂ evita realmente el autoconsumo solar",
+        "excerpt": "Desglosamos la metodología detrás de la cifra de CO₂ evitado que usa CronoSolar: de dónde sale, qué supuestos hace y qué no mide.",
+        "date": "2026-07-23",
+        "read_time": "4 min",
+    },
+    {
+        "slug": "curva-de-demanda",
+        "tag": "Red eléctrica",
+        "title": "La curva del pato: por qué compensa cargar la batería a mediodía",
+        "excerpt": "La demanda eléctrica española y la generación solar no siguen la misma curva. Entender el desajuste explica por qué tener batería cambia tanto las cuentas.",
+        "date": "2026-07-23",
+        "read_time": "4 min",
+    },
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -368,5 +404,46 @@ async def serve_optimizar(request: Request):
 @app.get("/tutoriales")
 async def serve_tutoriales(request: Request):
     return templates.TemplateResponse("tutoriales.html", {"request": request, "active": "tutoriales"})
+
+@app.get("/impacto")
+async def serve_impacto(request: Request):
+    return templates.TemplateResponse("impacto.html", {"request": request, "active": "impacto"})
+
+@app.get("/blog")
+async def serve_blog_index(request: Request):
+    return templates.TemplateResponse("blog_index.html", {"request": request, "active": "blog", "posts": BLOG_POSTS})
+
+@app.get("/blog/{slug}")
+async def serve_blog_post(request: Request, slug: str):
+    post = next((p for p in BLOG_POSTS if p["slug"] == slug), None)
+    if not post:
+        raise HTTPException(status_code=404, detail="Artículo no encontrado")
+    return templates.TemplateResponse("blog_post.html", {"request": request, "active": "blog", "post": post})
+
+@app.get("/instaladores")
+async def serve_instaladores(request: Request):
+    return templates.TemplateResponse("instaladores.html", {"request": request, "active": "instaladores"})
+
+
+class InstallerLead(BaseModel):
+    nombre: str
+    email: str
+    tipo: str
+    mensaje: Optional[str] = None
+
+
+LEADS_FILE = os.getenv("LEADS_FILE", "instaladores_leads.json")
+
+
+@app.post("/api/instaladores")
+async def submit_installer_lead(lead: InstallerLead):
+    leads = []
+    if os.path.exists(LEADS_FILE):
+        with open(LEADS_FILE) as f:
+            leads = json.load(f)
+    leads.append({**lead.model_dump(), "received_at": datetime.utcnow().isoformat()})
+    with open(LEADS_FILE, "w") as f:
+        json.dump(leads, f, ensure_ascii=False, indent=2)
+    return {"ok": True}
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

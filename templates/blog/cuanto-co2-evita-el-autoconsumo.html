@@ -1,0 +1,19 @@
+<p class="lead">"Ahorras 340 kg de CO₂ al año" suena bien en una landing page, pero ¿de dónde sale ese número y qué tan sólido es? Aquí desglosamos la metodología completa, sus supuestos y sus límites — con la misma cifra que usamos en nuestro <a href="/impacto">informe de impacto</a>.</p>
+
+<h2>El cálculo base</h2>
+<p>La fórmula que usamos es sencilla: <strong>kWh autoconsumidos de origen solar × factor de emisión medio de la red española</strong>. El primer término lo calcula la propia herramienta a partir de tu instalación (kWp, orientación, ubicación) y de la previsión de radiación solar. El segundo — el factor de emisión — es un valor de referencia de <strong>0,19 kg CO₂/kWh</strong>, tomado de los informes de generación eléctrica que publica Red Eléctrica de España (REE).</p>
+
+<h2>Por qué usamos un factor "medio" y no uno en tiempo real</h2>
+<p>El factor de emisión de la red cambia cada hora — de hecho es prácticamente el mismo dato que determina el precio del mercado (ver nuestro artículo sobre <a href="/blog/consumo-y-clima">consumo y clima</a>). En teoría, un cálculo perfecto usaría el factor de emisión exacto de cada hora del día en que autoconsumes. En la práctica, ese dato horario granular no está disponible públicamente en tiempo real con la fiabilidad necesaria para una app gratuita, así que usamos la media anual publicada por REE — una cifra más conservadora que probablemente <em>subestima</em> el ahorro real en las horas centrales del día, que suelen ser las más limpias del mix.</p>
+
+<h2>Qué NO mide esta cifra</h2>
+<ul style="padding-left:20px;line-height:1.9;margin:16px 0">
+<li><strong>No incluye la huella de fabricación de los paneles y la batería.</strong> Fabricar una instalación fotovoltaica también emite CO₂ — estudios de ciclo de vida sitúan el "payback" energético de un panel solar típico en 1-3 años de uso, tras los cuales el balance es claramente positivo, pero no es una cifra de "cero emisiones" desde el primer día.</li>
+<li><strong>No es un dato certificado para compensación de carbono</strong> — es una estimación orientativa para que entiendas el orden de magnitud de tu impacto, no un certificado válido para mercados de carbono voluntarios.</li>
+<li><strong>Varía con el año y la ubicación.</strong> El mix eléctrico español cambia de un año a otro (más o menos hidráulica según la lluvia, por ejemplo), y tu radiación solar depende de dónde vivas.</li>
+</ul>
+
+<h2>Por qué aun así merece la pena mirarlo</h2>
+<p>Ninguna cifra de impacto individual es perfecta, pero eso no la hace inútil. Saber que una instalación doméstica típica evita el equivalente a miles de kilómetros en coche al año es información real y accionable, incluso con sus márgenes de incertidumbre — de la misma forma que una etiqueta energética no mide el consumo exacto de tu casa, pero te da una base honesta para decidir.</p>
+
+<p class="src">Fuentes: <a href="https://www.ree.es/es/datos/generacion/no-renovables-detalle-emisiones-CO2" target="_blank" rel="noopener">REE — Emisiones de CO₂ asociadas a la generación eléctrica</a>, <a href="https://www.irena.org/Publications/2024/Sep/Renewable-Power-Generation-Costs-in-2023" target="_blank" rel="noopener">IRENA — Renewable Power Generation Costs 2023</a> (referencia de payback energético de sistemas fotovoltaicos).</p>
