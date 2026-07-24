@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aviso Legal — CronoSolar</title>
+<meta name="description" content="Identificación del titular de CronoSolar, condiciones de uso y régimen de responsabilidad.">
+{% set seo_title = "Aviso Legal — CronoSolar" %}
+{% set seo_description = "Identificación del titular de CronoSolar, condiciones de uso y régimen de responsabilidad." %}
+{% set seo_path = "aviso-legal" %}
+{% include "_seo_meta.html" %}
+<link rel="stylesheet" href="/static/fonts/fonts.css">
+<style>
+{% include "_base_styles.html" %}
+a:hover{color:var(--green)}
+#topbar{border-bottom:1px solid var(--bdr)}
+.wrap{max-width:760px;margin:0 auto;padding:60px 26px 80px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--green);font-weight:600;margin-bottom:16px}
+h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;letter-spacing:-1.2px;margin-bottom:12px}
+.updated{font-size:13px;color:var(--muted);margin-bottom:40px}
+h2{font-size:20px;font-weight:800;letter-spacing:-.4px;margin:40px 0 12px}
+p{font-size:15.5px;line-height:1.75;color:var(--ink)}
+p+p{margin-top:12px}
+ul{margin:12px 0 12px 20px;font-size:15.5px;line-height:1.8;color:var(--ink)}
+li{margin-bottom:4px}
+.box{background:var(--lemon-lite);border:1px solid var(--bdr);border-radius:14px;padding:20px 22px;margin:18px 0;font-size:14.5px}
+.box p{margin:0}
+.box p+p{margin-top:8px}
+</style>
+</head>
+<body>
+
+{% include "_nav.html" %}
+
+<div class="wrap">
+  <div class="eyebrow">Legal</div>
+  <h1>Aviso Legal</h1>
+  <p class="updated">Última actualización: 24 de julio de 2026</p>
+
+  <h2>1. Identificación del titular</h2>
+  <div class="box">
+    <p><strong>⚠️ Pendiente de completar.</strong> CronoSolar es, a fecha de esta versión, un proyecto sin forma societaria constituida. En cumplimiento del artículo 10 de la Ley 34/2002 (LSSI-CE), este apartado debe incluir la razón social o nombre completo del titular, su NIF/CIF, domicilio y datos de inscripción registral en cuanto existan.</p>
+    <p>Mientras tanto, el contacto operativo del servicio es: <a href="mailto:hola@cronosolar.es">hola@cronosolar.es</a></p>
+  </div>
+
+  <h2>2. Objeto</h2>
+  <p>CronoSolar es una herramienta gratuita que calcula, a partir de datos públicos (precio del mercado eléctrico y previsión meteorológica), un plan horario orientativo de carga y descarga para instalaciones de autoconsumo solar con o sin batería. Se ofrece a través de esta web y de un bot de Telegram (<a href="https://t.me/Cronosolar_bot" target="_blank" rel="noopener">@Cronosolar_bot</a>).</p>
+
+  <h2>3. Naturaleza orientativa del servicio</h2>
+  <p>Los cálculos de CronoSolar se basan en previsiones (precio publicado por ESIOS/REE, radiación solar prevista por Open-Meteo) y en los datos que tú introduces sobre tu instalación. Son <strong>estimaciones</strong>, no garantías: la producción solar real, el consumo real o el precio final pueden diferir de lo previsto. CronoSolar no sustituye el criterio de un instalador o técnico cualificado para la configuración de tu inversor o batería, y no asumimos responsabilidad por decisiones de programación tomadas exclusivamente a partir de estas estimaciones.</p>
+
+  <h2>4. Propiedad intelectual</h2>
+  <p>Los textos, diseño e ilustraciones propias de CronoSolar son de sus autores. Las fotografías utilizadas en el blog y en la sección de impacto proceden de Pexels, bajo licencia de uso libre. Los datos de precio eléctrico proceden de <a href="https://www.esios.ree.es" target="_blank" rel="noopener">ESIOS/REE</a> y los de previsión solar de <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>; los enlaces y capturas de documentación de fabricantes de inversores (Huawei, Fronius, Victron) pertenecen a sus respectivos titulares y se referencian únicamente a título informativo.</p>
+
+  <h2>5. Condiciones de uso</h2>
+  <ul>
+    <li>El servicio es gratuito y no requiere registro.</li>
+    <li>No debe usarse para ningún fin ilícito ni de forma que sobrecargue o dañe la infraestructura del servicio o la de terceros (ESIOS, Open-Meteo, OpenStreetMap, Telegram).</li>
+    <li>Nos reservamos el derecho a modificar, suspender o interrumpir el servicio en cualquier momento, sin que ello genere derecho a compensación alguna, dado su carácter gratuito.</li>
+  </ul>
+
+  <h2>6. Protección de datos</h2>
+  <p>El tratamiento de datos personales derivado del uso de esta web y del bot se describe en la <a href="/privacidad">Política de Privacidad</a>.</p>
+
+  <h2>7. Legislación aplicable</h2>
+  <p>Este aviso legal se rige por la legislación española, en particular la Ley 34/2002 de Servicios de la Sociedad de la Información y Comercio Electrónico (LSSI-CE) y el Reglamento (UE) 2016/679 (RGPD) junto con la Ley Orgánica 3/2018 (LOPDGDD) en lo relativo a protección de datos.</p>
+</div>
+
+{% include "_footer.html" %}
+
+</body>
+</html>

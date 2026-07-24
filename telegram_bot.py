@@ -288,6 +288,13 @@ HOUR_KEYBOARD = {
     "resize_keyboard": True,
 }
 
+BTN_CONFIRM_DELETE = "🗑️ Sí, borrar todo"
+BTN_CANCEL_DELETE = "Cancelar"
+CONFIRM_DELETE_KEYBOARD = {
+    "keyboard": [[{"text": BTN_CONFIRM_DELETE}, {"text": BTN_CANCEL_DELETE}]],
+    "resize_keyboard": True,
+}
+
 # Palabras sueltas (sin "/") que hacen lo mismo que su boton/comando equivalente
 RECONFIG_WORD_TO_FIELD = {
     "ubicacion": "location", "ubicación": "location", "localizacion": "location", "localización": "location",
@@ -438,6 +445,9 @@ async def handle_message(msg, users):
             "Cada tarde (a las 16:00 por defecto) te mando el plan del día "
             "siguiente para que programes tu inversor con calma y te olvides. "
             "Sin avisos cada hora — para eso está el propio inversor.\n\n"
+            "🔒 Guardo tu ubicación, instalación y avisos solo para calcular tu plan — "
+            "nunca se venden ni se comparten. Escribe *privacidad* para ver la política completa, "
+            "o *borrar* cuando quieras que elimine todo.\n\n"
             "Primero: ¿dónde está tu instalación? Comparte tu ubicación o "
             "escribe el nombre de tu localidad.",
             reply_markup=LOCATION_KEYBOARD,
@@ -473,7 +483,8 @@ async def handle_message(msg, users):
             f"🔌 Inversor: {INVERTER_LABELS.get(u.get('inverter'), 'no indicado')}\n"
             f"⏰ Plan diario a las: {u.get('alert_hour', DAILY_SEND_HOUR):02d}:00\n"
             f"🔔 Avisos horarios: {avisos}\n\n"
-            "¿Quieres cambiar algo? Toca un botón 👇",
+            "¿Quieres cambiar algo? Toca un botón 👇\n\n"
+            "_Escribe \"privacidad\" para ver qué guardamos, o \"borrar\" para eliminarlo todo._",
             reply_markup=RECONFIG_KEYBOARD,
         )
         return
@@ -482,6 +493,35 @@ async def handle_message(msg, users):
         u["awaiting"] = None
         save_users(users)
         await send_message(chat_id, "Vale, aquí tienes el menú principal 👇", reply_markup=MAIN_KEYBOARD)
+        return
+
+    # Derecho de supresión (RGPD art. 17): borra toda la ubicación, instalación
+    # e historial guardados de este usuario, con confirmación explícita para
+    # evitar un borrado accidental por un mensaje mal escrito.
+    if text.lower() in ("borrar", "borrar mis datos", "olvidame", "olvídame", "eliminar mis datos", "/borrar"):
+        u["awaiting"] = "confirm_delete"
+        save_users(users)
+        await send_message(
+            chat_id,
+            "⚠️ Esto borra *todo* lo que tengo guardado tuyo: ubicación, instalación, marca de inversor y el histórico de planes. "
+            "No se puede deshacer.\n\n¿Seguro?",
+            reply_markup=CONFIRM_DELETE_KEYBOARD,
+        )
+        return
+
+    if text.lower() in ("privacidad", "política de privacidad", "/privacidad"):
+        await send_message(chat_id, f"🔒 Política de privacidad: {WEB_PUBLIC_URL}/privacidad\n📄 Aviso legal: {WEB_PUBLIC_URL}/aviso-legal")
+        return
+
+    if awaiting == "confirm_delete":
+        if text == BTN_CONFIRM_DELETE:
+            del users[chat_id]
+            save_users(users)
+            await send_message(chat_id, "🗑️ Borrado. No queda nada guardado tuyo — escribe /start cuando quieras volver a usar el bot.", reply_markup=REMOVE_KEYBOARD)
+        else:
+            u["awaiting"] = None
+            save_users(users)
+            await send_message(chat_id, "Vale, no se borra nada.", reply_markup=MAIN_KEYBOARD)
         return
 
     # Cambiar un ajuste: tocando el botón del menú de configuración, o

@@ -9,10 +9,9 @@
 {% set seo_description = "Calculadora gratuita: introduce tu instalación solar y batería y obtén el plan horario óptimo del día, con el precio real del mercado eléctrico (ESIOS/REE) y tu previsión solar." %}
 {% set seo_path = "optimizar" %}
 {% include "_seo_meta.html" %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.min.css"/>
+<script src="/static/vendor/leaflet/leaflet.min.js"></script>
+<link rel="stylesheet" href="/static/fonts/fonts.css">
 <style>
 {% include "_base_styles.html" %}
 :root { --r:14px; --amber:#B8860B; --brick:#B23A48; --violet:#6B4FA0; --teal:#0A8F82; }
@@ -180,6 +179,7 @@ if (fromLink) {
 }
 
 // ── Leaflet Map ──
+L.Icon.Default.imagePath = '/static/vendor/leaflet/images/';
 const map = L.map('map',{zoomControl:true}).setView([41.61,2.29],13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   attribution:'© OpenStreetMap',maxZoom:19

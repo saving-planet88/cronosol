@@ -544,6 +544,14 @@ async def serve_blog_post(request: Request, slug: str):
 async def serve_instaladores(request: Request):
     return templates.TemplateResponse("instaladores.html", {"request": request, "active": "instaladores"})
 
+@app.get("/privacidad")
+async def serve_privacidad(request: Request):
+    return templates.TemplateResponse("legal_privacidad.html", {"request": request, "active": "privacidad"})
+
+@app.get("/aviso-legal")
+async def serve_aviso_legal(request: Request):
+    return templates.TemplateResponse("legal_aviso.html", {"request": request, "active": "aviso-legal"})
+
 
 class InstallerLead(BaseModel):
     nombre: str
@@ -582,6 +590,8 @@ async def sitemap_xml(request: Request):
         ("impacto", "0.7"),
         ("blog", "0.7"),
         ("instaladores", "0.5"),
+        ("privacidad", "0.2"),
+        ("aviso-legal", "0.2"),
     ]
     urls = [f"<url><loc>{base}{path}</loc><priority>{priority}</priority></url>" for path, priority in static_pages]
     for post in BLOG_POSTS:

@@ -9,8 +9,7 @@
 {% set seo_description = "Recomienda CronoSolar a tus clientes: una herramienta gratuita que les ayuda a sacar más partido a la instalación que tú les has hecho." %}
 {% set seo_path = "instaladores" %}
 {% include "_seo_meta.html" %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/fonts/fonts.css">
 <style>
 {% include "_base_styles.html" %}
 a:hover{color:var(--green)}
@@ -115,6 +114,10 @@ form button:hover{background:var(--forest)}
       </select>
       <label for="mensaje">Mensaje (opcional)</label>
       <textarea id="mensaje" name="mensaje" placeholder="Zona donde trabajas, tamaño del equipo, cualquier cosa que nos ayude a responderte mejor..."></textarea>
+      <label style="display:flex;align-items:flex-start;gap:9px;font-weight:500;font-size:13px;color:var(--muted);cursor:pointer">
+        <input type="checkbox" id="consent" name="consent" required style="width:auto;margin:2px 0 0;flex-shrink:0">
+        He leído y acepto la <a href="/privacidad" target="_blank" style="color:var(--green);font-weight:600">política de privacidad</a>. Usaremos estos datos solo para responder a tu solicitud de colaboración.
+      </label>
       <button type="submit">Enviar</button>
     </form>
     <div class="formok" id="install-ok">

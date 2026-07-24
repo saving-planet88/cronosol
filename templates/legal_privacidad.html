@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Política de Privacidad — CronoSolar</title>
+<meta name="description" content="Qué datos recoge CronoSolar, para qué, cuánto tiempo se guardan y cómo ejercer tus derechos.">
+{% set seo_title = "Política de Privacidad — CronoSolar" %}
+{% set seo_description = "Qué datos recoge CronoSolar, para qué, cuánto tiempo se guardan y cómo ejercer tus derechos." %}
+{% set seo_path = "privacidad" %}
+{% include "_seo_meta.html" %}
+<link rel="stylesheet" href="/static/fonts/fonts.css">
+<style>
+{% include "_base_styles.html" %}
+a:hover{color:var(--green)}
+#topbar{border-bottom:1px solid var(--bdr)}
+.wrap{max-width:760px;margin:0 auto;padding:60px 26px 80px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--green);font-weight:600;margin-bottom:16px}
+h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;letter-spacing:-1.2px;margin-bottom:12px}
+.updated{font-size:13px;color:var(--muted);margin-bottom:40px}
+h2{font-size:20px;font-weight:800;letter-spacing:-.4px;margin:40px 0 12px}
+h3{font-size:15.5px;font-weight:700;margin:22px 0 8px}
+p{font-size:15.5px;line-height:1.75;color:var(--ink)}
+p+p{margin-top:12px}
+ul,ol{margin:12px 0 12px 20px;font-size:15.5px;line-height:1.8;color:var(--ink)}
+li{margin-bottom:4px}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--bdr);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+.box{background:var(--lemon-lite);border:1px solid var(--bdr);border-radius:14px;padding:20px 22px;margin:18px 0;font-size:14.5px}
+.box p{margin:0}
+code{font-family:var(--mono);font-size:13px;background:var(--cream);border-radius:4px;padding:1px 6px}
+</style>
+</head>
+<body>
+
+{% include "_nav.html" %}
+
+<div class="wrap">
+  <div class="eyebrow">Legal</div>
+  <h1>Política de Privacidad</h1>
+  <p class="updated">Última actualización: 24 de julio de 2026</p>
+
+  <p>Esta política explica, en el mismo tono directo que el resto de CronoSolar, qué datos recogemos, para qué los usamos, cuánto tiempo los guardamos y cómo puedes ejercer tus derechos. La regla general: guardamos lo mínimo necesario para calcular tu plan, nada más.</p>
+
+  <h2>1. Quién trata tus datos</h2>
+  <div class="box">
+    <p><strong>Responsable:</strong> CronoSolar — proyecto aún no constituido formalmente como sociedad. Este apartado se actualizará con la identidad fiscal completa (razón social, NIF/CIF, domicilio) en cuanto exista una entidad registrada; mientras tanto, cualquier gestión relativa a tus datos se atiende por el canal de contacto de abajo.</p>
+  </div>
+  <p><strong>Contacto:</strong> <a href="mailto:hola@cronosolar.es">hola@cronosolar.es</a></p>
+
+  <h2>2. Qué datos recogemos y para qué</h2>
+
+  <h3>2.1 Si usas la web (calculadora en <code>/optimizar</code> o la landing)</h3>
+  <p>Introduces tu ubicación, potencia de paneles, batería, consumo e inclinación/orientación del tejado. Estos datos se envían a nuestro servidor solo para calcular el plan horario en el momento — <strong>no se guardan</strong>: cada cálculo es una petición sin estado, no hay base de datos de usuarios web ni cuentas ni cookies de sesión.</p>
+  <p>La búsqueda de tu localidad (código postal o nombre) se envía directamente desde tu navegador al servicio de geocodificación de OpenStreetMap (Nominatim) — no pasa por nuestro servidor, así que nosotros no la recibimos ni almacenamos, pero sí llega a ese tercero.</p>
+
+  <h3>2.2 Si usas el bot de Telegram</h3>
+  <p>Aquí sí guardamos datos, porque el bot necesita recordar tu instalación para mandarte el plan cada tarde sin que tengas que repetirlo. Concretamente:</p>
+  <table>
+    <tr><th>Dato</th><th>Para qué</th></tr>
+    <tr><td>Identificador de chat de Telegram</td><td>Saber a quién enviar cada mensaje</td></tr>
+    <tr><td>Ubicación (coordenadas y nombre de localidad)</td><td>Calcular tu previsión solar</td></tr>
+    <tr><td>Potencia de paneles, batería, consumo diario</td><td>Calcular tu plan de ahorro</td></tr>
+    <tr><td>Marca de inversor (opcional)</td><td>Enlazarte la guía correcta en /tutoriales</td></tr>
+    <tr><td>Hora preferida de aviso y si tienes avisos horarios activados</td><td>Mandarte el mensaje cuando quieres, no antes</td></tr>
+    <tr><td>Último plan calculado</td><td>Poder mostrártelo sin recalcular y evitar avisos duplicados</td></tr>
+  </table>
+  <p>Este conjunto se guarda en un fichero en nuestro servidor (no en una base de datos de terceros), en un centro de datos dentro de la Unión Europea. Se conserva mientras uses el bot activamente. Puedes borrarlo todo cuando quieras escribiendo <code>borrar</code> al bot — lo elimina de inmediato y sin necesidad de esperar a que lo procesemos manualmente.</p>
+
+  <h3>2.3 Si rellenas el formulario de instaladores (<code>/instaladores</code>)</h3>
+  <p>Guardamos tu nombre, email, tipo de colaboración y mensaje, únicamente para responderte. No se usan para ningún otro fin ni se ceden a terceros.</p>
+
+  <h2>3. Base legal</h2>
+  <p>En todos los casos, la base legal es tu <strong>consentimiento</strong>, prestado al usar voluntariamente el bot o al enviar el formulario (art. 6.1.a RGPD). Puedes retirarlo en cualquier momento — ver sección 5.</p>
+
+  <h2>4. Con quién compartimos datos</h2>
+  <p>No vendemos ni cedemos tus datos a terceros con fines comerciales. Para que el servicio funcione, algunos datos pasan necesariamente por proveedores técnicos:</p>
+  <ul>
+    <li><strong>ESIOS/REE</strong> (Red Eléctrica de España) — consultamos el precio del mercado eléctrico; no les enviamos ningún dato tuyo identificable.</li>
+    <li><strong>Open-Meteo</strong> — consultamos la previsión solar de tu ubicación (coordenadas), sin más datos personales.</li>
+    <li><strong>OpenStreetMap / Nominatim</strong> — si buscas tu localidad, tu navegador consulta directamente su servicio (ver 2.1).</li>
+    <li><strong>Telegram</strong> — si usas el bot, Telegram transporta los mensajes; Telegram actúa como responsable independiente de esa infraestructura, sujeta a su propia política de privacidad.</li>
+    <li><strong>DigitalOcean</strong> — aloja nuestro servidor (centro de datos en la Unión Europea), actuando como encargado de tratamiento.</li>
+  </ul>
+
+  <h2>5. Tus derechos</h2>
+  <p>Tienes derecho a acceder, rectificar, suprimir, limitar el tratamiento, oponerte y solicitar la portabilidad de tus datos (arts. 15-22 RGPD). En la práctica:</p>
+  <ul>
+    <li><strong>Ver o borrar tus datos del bot:</strong> escríbele <code>privacidad</code> o <code>borrar</code> directamente.</li>
+    <li><strong>Cualquier otra solicitud</strong> (acceso, rectificación, portabilidad, oposición): escribe a <a href="mailto:hola@cronosolar.es">hola@cronosolar.es</a>.</li>
+    <li>Si consideras que no hemos atendido tu solicitud correctamente, puedes reclamar ante la <a href="https://www.aepd.es" target="_blank" rel="noopener">Agencia Española de Protección de Datos (AEPD)</a>.</li>
+  </ul>
+
+  <h2>6. Cookies</h2>
+  <p>Esta web no utiliza cookies propias — no hay registro de usuario, ni sesión, ni analítica. Los mapas y tipografías se cargan desde nuestro propio servidor. La búsqueda de localidad y el mapa interactivo consultan servicios de OpenStreetMap, que pueden recibir tu dirección IP como parte técnica normal de esa consulta.</p>
+
+  <h2>7. Menores</h2>
+  <p>CronoSolar no está dirigido a menores de 14 años ni se recogen conscientemente datos de menores.</p>
+
+  <h2>8. Cambios en esta política</h2>
+  <p>Si cambiamos algo relevante (nuevo tratamiento, nuevo tercero, nueva finalidad), lo reflejaremos aquí actualizando la fecha de la cabecera.</p>
+</div>
+
+{% include "_footer.html" %}
+
+</body>
+</html>
