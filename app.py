@@ -5,6 +5,7 @@ calcula el plan óptimo de carga/descarga y estima el ahorro.
 """
 
 import json
+import logging
 import math
 import os
 from datetime import date, datetime, timedelta
@@ -22,9 +23,43 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+log = logging.getLogger("cronosolar")
+
 ESIOS_TOKEN = os.getenv("ESIOS_TOKEN", "")
 # Indicador 600: Precio mercado diario España (€/MWh)
 ESIOS_INDICATOR = 600
+
+# ── Aviso de uso de Open-Meteo ────────────────────────────
+# El plan gratuito de Open-Meteo tiene un límite orientativo de ~10.000
+# llamadas/día. Avisamos con margen para poder pasar a plan de pago o
+# cachear antes de que el servicio empiece a fallar sin previsión.
+OPEN_METEO_DAILY_WARN = 9000
+ADMIN_TELEGRAM_CHAT_ID = os.getenv("ADMIN_TELEGRAM_CHAT_ID", "")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+_open_meteo_usage = {"date": None, "count": 0, "alerted": False}
+
+
+async def _track_open_meteo_call():
+    today = str(date.today())
+    if _open_meteo_usage["date"] != today:
+        _open_meteo_usage["date"] = today
+        _open_meteo_usage["count"] = 0
+        _open_meteo_usage["alerted"] = False
+    _open_meteo_usage["count"] += 1
+    if _open_meteo_usage["count"] >= OPEN_METEO_DAILY_WARN and not _open_meteo_usage["alerted"]:
+        _open_meteo_usage["alerted"] = True
+        msg = f"⚠️ Open-Meteo: {_open_meteo_usage['count']} llamadas hoy ({today}) — cerca o por encima del límite gratuito orientativo."
+        log.warning(msg)
+        if ADMIN_TELEGRAM_CHAT_ID and TELEGRAM_BOT_TOKEN:
+            try:
+                async with httpx.AsyncClient(timeout=10) as client:
+                    await client.post(
+                        f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+                        json={"chat_id": ADMIN_TELEGRAM_CHAT_ID, "text": msg},
+                    )
+            except Exception as e:
+                log.error(f"No se pudo enviar el aviso de Open-Meteo por Telegram: {e}")
 
 app = FastAPI(title="SolOptim API")
 templates = Jinja2Templates(directory="templates")
@@ -247,6 +282,7 @@ async def fetch_solar_forecast(
     lat: float, lon: float, kwp: float, tilt: float, azimuth: float, target_date: date
 ) -> list[float]:
     """Devuelve 24 valores de producción solar estimada en kW para cada hora."""
+    await _track_open_meteo_call()
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
@@ -429,7 +465,11 @@ def optimize(
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "open_meteo_calls_today": _open_meteo_usage["count"],
+        "open_meteo_date": _open_meteo_usage["date"],
+    }
 
 
 @app.post("/api/optimize", response_model=OptimizationResult)
