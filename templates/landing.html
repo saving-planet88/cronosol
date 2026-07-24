@@ -34,6 +34,15 @@ a:hover{color:var(--green)}
   .grid-2a{grid-template-columns:1fr!important}
   .grid-2b{grid-template-columns:1fr!important}
 }
+@media(max-width:900px){
+  /* Por debajo de escritorio ancho, el texto del hero (max-width:640px)
+     ocupa proporcionalmente más ancho de pantalla, así que el degradado
+     horizontal original dejaba parte del párrafo sobre la foto sin velo,
+     ilegible contra el árbol (se notaba ya en tablet, no solo en móvil).
+     Se cambia a un velo vertical: opaco arriba (donde está el texto), se
+     aclara hacia abajo (donde ya no hay texto, solo botones). */
+  #hero{background-image:linear-gradient(180deg,rgba(233,239,176,.95) 0%,rgba(233,239,176,.95) 62%,rgba(233,239,176,.55) 100%),url('/static/assets/hero-sm.webp')!important}
+}
 @media(max-width:760px){
   .grid-3{grid-template-columns:1fr!important}
   .grid-3-eq{grid-template-columns:1fr!important}
