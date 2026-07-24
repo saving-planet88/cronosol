@@ -32,7 +32,9 @@ p+p{margin-top:14px}
 .src{font-size:12.5px;color:var(--muted);margin-top:36px;padding-top:20px;border-top:1px solid var(--bdr)}
 .src a{color:var(--green);font-weight:600}
 .back{display:inline-block;margin-bottom:20px;font-size:13.5px;font-weight:600;color:var(--muted)}
-.hero-img{width:100%;height:auto;border-radius:16px;margin-bottom:32px;display:block}
+.hero-img-wrap{position:relative;margin-bottom:32px}
+.hero-img{width:100%;height:auto;border-radius:16px;display:block}
+.hero-img-credit{position:absolute;bottom:10px;right:10px;font-size:10.5px;color:rgba(255,255,255,.85);background:rgba(14,61,44,.55);padding:3px 9px;border-radius:999px;font-family:var(--mono)}
 </style>
 <script type="application/ld+json">
 {
@@ -62,7 +64,10 @@ p+p{margin-top:14px}
   <div class="eyebrow">{{ post.tag }}</div>
   <h1>{{ post.title }}</h1>
   <div class="meta">{{ post.date }} · {{ post.read_time }} de lectura</div>
-  <img class="hero-img" src="/static/assets/blog/{{ post.slug }}.webp" alt="{{ post.title }}" width="1200" height="630">
+  <div class="hero-img-wrap">
+    <img class="hero-img" src="/static/assets/blog/{{ post.slug }}.webp" alt="{{ post.title }}" width="1200" height="630">
+    <span class="hero-img-credit">Foto: Pexels</span>
+  </div>
   {% include "blog/" ~ post.slug ~ ".html" %}
 </div>
 
